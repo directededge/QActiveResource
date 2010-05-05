@@ -28,8 +28,15 @@ namespace ActiveResource
         bool isNull() const;
         QString key() const;
         QString value() const;
+
     private:
-        struct Data;
+        struct Data : public QSharedData
+        {
+            Data(const QString &k, const QString &v) : key(k), value(v) {}
+            QString key;
+            QString value;
+        };
+
         QSharedDataPointer<Data> d;
     };
 
@@ -43,7 +50,12 @@ namespace ActiveResource
     protected:
         Base(const QUrl &base);
     private:
-        struct Data;
+        struct Data : public QSharedData
+        {
+            Data(const QUrl &b) : base(b) {}
+            QUrl base;
+        };
+
         QSharedDataPointer<Data> d;
     };
 }

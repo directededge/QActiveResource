@@ -9,14 +9,9 @@
 #include <QNetworkReply>
 #include <QXmlStreamReader>
 
-using namespace ActiveResource;
+#include <QDebug>
 
-struct Param::Data : public QSharedData
-{
-    Data(const QString &k, const QString &v) : key(k), value(v) {}
-    QString key;
-    QString value;
-};
+using namespace ActiveResource;
 
 Param::Param() :
     d(0)
@@ -32,7 +27,7 @@ Param::Param(const QString &key, const QString &value) :
 
 bool Param::isNull() const
 {
-    return d;
+    return d == 0;
 }
 
 QString Param::key() const
@@ -44,21 +39,6 @@ QString Param::value() const
 {
     return isNull() ? QString() : d->value;
 }
-
-struct Base::Data : public QSharedData
-{
-    Data(const QUrl &b) : base(b) {}
-
-    static void addQueryItem(QUrl *url, const Param &param)
-    {
-        if(!param.isNull())
-        {
-            url->addQueryItem(param.key(), param.value());
-        }
-    }
-
-    QUrl base;
-};
 
 RecordList Base::find(FindStyle style, const QString &from, const QList<Param> &params)
 {
@@ -74,7 +54,20 @@ RecordList Base::find(FindStyle style, const QString &from, const QList<Param> &
 
     QNetworkAccessManager net;
     QNetworkReply *reply = net.get(QNetworkRequest(url));
-    QXmlStreamReader xml(reply);
+
+    qDebug() << url;
+
+    while(reply->waitForReadyRead(30 * 1000 /* 30 seconds */) || reply->isRunning())
+    {
+        qDebug() << reply->readAll();
+    }
+
+    if(reply->error() != QNetworkReply::NoError)
+    {
+        qDebug() << reply->errorString();
+    }
+
+    // QXmlStreamReader xml(reply);
 
     return RecordList();
 }
@@ -91,4 +84,5 @@ Base::Base(const QUrl &base) :
 {
 
 }
+
 
