@@ -6,6 +6,8 @@
 
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QXmlStreamReader>
 
 using namespace ActiveResource;
 
@@ -69,20 +71,30 @@ struct Base::Data : public QSharedData
     QUrl base;
 };
 
+RecordList Base::find(FindStyle style, const QString &from, const QList<Param> &params)
+{
+    QUrl url = d->base;
+
+    foreach(Param param, params)
+    {
+        if(!param.isNull())
+        {
+            url.addQueryItem(param.key(), param.value());
+        }
+    }
+
+    QNetworkAccessManager net;
+    QNetworkReply *reply = net.get(QNetworkRequest(url));
+    QXmlStreamReader xml(reply);
+
+    return RecordList();
+}
+
 RecordList Base::find(FindStyle style, const QString &from,
                       const Param &first, const Param &second,
                       const Param &third, const Param &fourth)
 {
-    QUrl url = d->base;
-    Data::addQueryItem(&url, first);
-    Data::addQueryItem(&url, second);
-    Data::addQueryItem(&url, third);
-    Data::addQueryItem(&url, fourth);
-
-    QNetworkAccessManager net;
-    QNetworkReply *reply = net.get(QNetworkRequest(url));
-
-    return RecordList();
+    return find(style, from, QList<Param>() << first << second << third << fourth);
 }
 
 Base::Base(const QUrl &base) :

@@ -46,6 +46,7 @@ namespace ActiveResource
     class Base
     {
     public:
+        RecordList find(FindStyle style, const QString &from, const QList<Param> &params);
         RecordList find(FindStyle style = FindAll, const QString &from = QString(),
                         const Param &first = Param(), const Param &second = Param(),
                         const Param &third = Param(), const Param &fourth = Param());

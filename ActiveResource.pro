@@ -1,6 +1,6 @@
 TEMPLATE = lib
 TARGET = 
-QT += network
+QT += network xml
 DEPENDPATH += .
 INCLUDEPATH += .
 
