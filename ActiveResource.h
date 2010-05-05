@@ -9,17 +9,7 @@
 
 namespace ActiveResource
 {
-    class Record
-    {
-    public:
-        Record();
-        QHash<QString, QVariant> fields() const;
-        QVariant operator[](const QString &key) const;
-    private:
-        struct Data;
-        QSharedDataPointer<Data> d;
-    };
-
+    typedef QHash<QString, QVariant> Record;
     typedef QList<Record> RecordList;
 
     enum FindStyle

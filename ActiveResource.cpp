@@ -11,17 +11,6 @@
 
 using namespace ActiveResource;
 
-struct Record::Data : public QSharedData
-{
-    QHash<QString, QVariant> fields;
-};
-
-Record::Record() :
-    d(new Data)
-{
-
-}
-
 struct Param::Data : public QSharedData
 {
     Data(const QString &k, const QString &v) : key(k), value(v) {}
