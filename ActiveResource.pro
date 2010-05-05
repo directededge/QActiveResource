@@ -1,8 +1,9 @@
 TEMPLATE = lib
 TARGET = 
-QT += network xml
+QT += xml
 DEPENDPATH += .
 INCLUDEPATH += .
+LIBS += -lcurl
 
 # Input
 HEADERS += ActiveResource.h
