@@ -4,6 +4,8 @@
 
 #include "ActiveResource.h"
 #include <QXmlStreamReader>
+#include <QStringList>
+#include <QDateTime>
 #include <QDebug>
 #include <curl/curl.h>
 
@@ -70,9 +72,22 @@ QString Param::value() const
     return isNull() ? QString() : d->value;
 }
 
-RecordList Base::find(FindStyle style, const QString &from, const QList<Param> &params)
+Resource::Resource(const QUrl &base, const QString &resource) :
+    d(new Data(base, resource))
 {
-    QUrl url = d->base;
+
+}
+
+Record Resource::find(QVariant id) const
+{
+    return find(FindOne, id.toString());
+}
+
+RecordList Resource::find(FindMulti style, const QString &from, const QList<Param> &params) const
+{
+    Q_UNUSED(style);
+
+    QUrl url = d->url;
 
     foreach(Param param, params)
     {
@@ -82,22 +97,186 @@ RecordList Base::find(FindStyle style, const QString &from, const QList<Param> &
         }
     }
 
-    QXmlStreamReader xml(reply);
+    if(!from.isEmpty())
+    {
+        url.setPath(url.path() + "/" + from);
+    }
 
-    return RecordList();
+    return find(url);
 }
 
-RecordList Base::find(FindStyle style, const QString &from,
+Record Resource::find(FindSingle style, const QString &from, const QList<Param> &params) const
+{
+    QUrl url = d->url;
+
+    foreach(Param param, params)
+    {
+        if(!param.isNull())
+        {
+            url.addQueryItem(param.key(), param.value());
+        }
+    }
+
+    if(!from.isEmpty())
+    {
+        url.setPath(url.path() + "/" + from);
+    }
+
+    switch(style)
+    {
+    case FindOne:
+    case FindFirst:
+    {
+        RecordList results = find(FindAll, from, params);
+        return results.isEmpty() ? Record() : results.front();
+    }
+    case FindLast:
+    {
+        RecordList results = find(FindAll, from, params);
+        return results.isEmpty() ? Record() : results.back();
+    }
+    }
+
+    return Record();
+}
+
+Record Resource::find(FindSingle style, const QString &from,
                       const Param &first, const Param &second,
-                      const Param &third, const Param &fourth)
+                      const Param &third, const Param &fourth) const
 {
     return find(style, from, QList<Param>() << first << second << third << fourth);
 }
 
-Base::Base(const QUrl &base) :
-    d(new Data(base))
+RecordList Resource::find(FindMulti style, const QString &from,
+                          const Param &first, const Param &second,
+                          const Param &third, const Param &fourth) const
 {
-
+    return find(style, from, QList<Param>() << first << second << third << fourth);
 }
 
+static QVariant::Type lookupType(const QString &name)
+{
+    static QHash<QString, QVariant::Type> types;
 
+    if(types.isEmpty())
+    {
+        types["integer"] = QVariant::Int;
+        types["decimal"] = QVariant::Double;
+        types["datetime"] = QVariant::DateTime;
+        types["boolean"] = QVariant::Bool;
+    }
+
+    return types.contains(name) ? types[name] : QVariant::String;
+}
+
+static QVariant reader(QXmlStreamReader &xml, bool advance = true)
+{
+    Record record;
+    QStringRef firstElement;
+
+    while(!xml.atEnd())
+    {
+        if(advance)
+        {
+            xml.readNext();
+        }
+        if(xml.tokenType() == QXmlStreamReader::StartElement)
+        {
+            if(firstElement.isNull())
+            {
+                firstElement = xml.name();
+            }
+
+            if(xml.attributes().value("type") == "array")
+            {
+                QStringRef name = xml.name();
+                QList<QVariant> array;
+
+                while(xml.readNext() == QXmlStreamReader::StartElement ||
+                      (xml.tokenType() == QXmlStreamReader::Characters && xml.isWhitespace()))
+                {
+                    if(!xml.isWhitespace())
+                    {
+                        array.append(reader(xml, false));
+                    }
+                }
+
+                record[name.toString()] = array;
+            }
+            else if(xml.attributes().value("nil") == "true")
+            {
+                record[xml.name().toString()] = QVariant();
+            }
+            else if(advance)
+            {
+                QVariant value;
+                QString text = xml.readElementText();
+
+                switch(lookupType(xml.attributes().value("type").toString()))
+                {
+                case QVariant::Int:
+                    value = text.toInt();
+                    break;
+                case QVariant::Double:
+                    value = text.toDouble();
+                    break;
+                case QVariant::DateTime:
+                    value = QDateTime::fromString(text, Qt::ISODate);
+                    break;
+                case QVariant::Bool:
+                    value = bool(text == "true");
+                    break;
+                default:
+                    value = text;
+                }
+
+                record[xml.name().toString()] = value;
+            }
+        }
+        if(xml.tokenType() == QXmlStreamReader::EndElement &&
+           !firstElement.isNull() && firstElement == xml.name())
+        {
+            return record;
+        }
+
+        advance = true;
+    }
+
+    return QVariant();
+}
+
+RecordList Resource::find(QUrl url) const
+{
+    if(!url.path().endsWith(".xml"))
+    {
+        url.setPath(url.path() + ".xml");
+    }
+
+    QByteArray data = HTTP::get(url);
+
+    QXmlStreamReader xml(data);
+
+    QVariant value = reader(xml);
+    RecordList records;
+
+    if(value.type() == QVariant::List)
+    {
+        foreach(QVariant v, value.toList())
+        {
+            records.append(v.toHash());
+        }
+    }
+    else if(value.type() == QVariant::Hash && value.toHash().size() == 1)
+    {
+        foreach(QVariant v, value.toHash().begin()->toList())
+        {
+            records.append(v.toHash());
+        }
+    }
+    else
+    {
+        records.append(value.toHash());
+    }
+
+    return records;
+}
