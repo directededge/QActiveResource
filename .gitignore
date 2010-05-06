@@ -1,0 +1,10 @@
+*~
+*.swp
+*.dylib
+*.o
+*.so
+Makefile
+*.bundle
+*.log
+moc_*.*
+Benchmark/benchmark
