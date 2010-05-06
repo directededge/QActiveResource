@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010, Directed Edge, Inc.
+ * Copyright (C) 2010, Directed Edge, Inc. | Licensed under the MPL and LGPL
  */
 
 #include "QActiveResource.h"

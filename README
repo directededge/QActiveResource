@@ -1,0 +1,17 @@
+This is a basic implementation of Ruby's ActiveResource for Qt.  At the moment
+it only supports reading, but offers vast speed improvements of Ruby's native
+implementation (using Nokogiri or otherwise).
+
+Building requires Qt and libcurl installed and their respective development
+headers.
+
+Also included are bindings to make use of these classes from Ruby.  There are
+some benchmarks in the "Benchmarks" subdirectory including the results and 
+test code / data.  Currently this implementation, when used from inside Ruby,
+is about 35x faster than the default ActiveResource implementation.
+
+The code is dual-licensed under the LGPL and MPL.
+
+Enjoy!
+
+Scott Wheeler <wheeler@kde.org>

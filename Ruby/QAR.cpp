@@ -1,5 +1,8 @@
-#include <QActiveResource.h>
+/*
+ * Copyright (C) 2010, Directed Edge, Inc. | Licensed under the MPL and LGPL
+ */
 
+#include <QActiveResource.h>
 #include <ruby.h>
 
 extern "C"
