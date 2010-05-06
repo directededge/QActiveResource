@@ -45,115 +45,6 @@ namespace HTTP
     }
 }
 
-Param::Param() :
-    d(0)
-{
-
-}
-
-Param::Param(const QString &key, const QString &value) :
-    d(new Data(key, value))
-{
-
-}
-
-bool Param::isNull() const
-{
-    return d == 0;
-}
-
-QString Param::key() const
-{
-    return isNull() ? QString() : d->key;
-}
-
-QString Param::value() const
-{
-    return isNull() ? QString() : d->value;
-}
-
-Resource::Resource(const QUrl &base, const QString &resource) :
-    d(new Data(base, resource))
-{
-
-}
-
-Record Resource::find(QVariant id) const
-{
-    return find(FindOne, id.toString());
-}
-
-RecordList Resource::find(FindMulti style, const QString &from, const QList<Param> &params) const
-{
-    Q_UNUSED(style);
-
-    QUrl url = d->url;
-
-    foreach(Param param, params)
-    {
-        if(!param.isNull())
-        {
-            url.addQueryItem(param.key(), param.value());
-        }
-    }
-
-    if(!from.isEmpty())
-    {
-        url.setPath(url.path() + "/" + from);
-    }
-
-    return find(url);
-}
-
-Record Resource::find(FindSingle style, const QString &from, const QList<Param> &params) const
-{
-    QUrl url = d->url;
-
-    foreach(Param param, params)
-    {
-        if(!param.isNull())
-        {
-            url.addQueryItem(param.key(), param.value());
-        }
-    }
-
-    if(!from.isEmpty())
-    {
-        url.setPath(url.path() + "/" + from);
-    }
-
-    switch(style)
-    {
-    case FindOne:
-    case FindFirst:
-    {
-        RecordList results = find(FindAll, from, params);
-        return results.isEmpty() ? Record() : results.front();
-    }
-    case FindLast:
-    {
-        RecordList results = find(FindAll, from, params);
-        return results.isEmpty() ? Record() : results.back();
-    }
-    }
-
-    return Record();
-}
-
-Record Resource::find(FindSingle style, const QString &from,
-                      const Param &first, const Param &second,
-                      const Param &third, const Param &fourth) const
-{
-    return find(style, from, QList<Param>() << first << second << third << fourth);
-}
-
-RecordList Resource::find(FindMulti style, const QString &from,
-                          const Param &first, const Param &second,
-                          const Param &third, const Param &fourth) const
-{
-    return find(style, from, QList<Param>() << first << second << third << fourth);
-}
-
 static QVariant::Type lookupType(const QString &name)
 {
     static QHash<QString, QVariant::Type> types;
@@ -245,7 +136,7 @@ static QVariant reader(QXmlStreamReader &xml, bool advance = true)
     return QVariant();
 }
 
-RecordList Resource::find(QUrl url) const
+static RecordList fetch(QUrl url)
 {
     if(!url.path().endsWith(".xml"))
     {
@@ -279,4 +170,144 @@ RecordList Resource::find(QUrl url) const
     }
 
     return records;
+}
+
+/*
+ * Param::Data
+ */
+
+Param::Data::Data(const QString &k, const QString &v) :
+    key(k),
+    value(v)
+{
+
+}
+
+/*
+ * Param
+ */
+
+Param::Param() :
+    d(0)
+{
+
+}
+
+Param::Param(const QString &key, const QString &value) :
+    d(new Data(key, value))
+{
+
+}
+
+bool Param::isNull() const
+{
+    return d == 0;
+}
+
+QString Param::key() const
+{
+    return isNull() ? QString() : d->key;
+}
+
+QString Param::value() const
+{
+    return isNull() ? QString() : d->value;
+}
+
+/*
+ * Resource::Data
+ */
+
+Resource::Data::Data(const QUrl &b, const QString &r) :
+    base(b),
+    resource(r),
+    url(base)
+{
+    url.setPath(url.path() + "/" + resource);
+}
+
+/*
+ * Resource
+ */
+
+Resource::Resource(const QUrl &base, const QString &resource) :
+    d(new Data(base, resource))
+{
+
+}
+
+Record Resource::find(QVariant id) const
+{
+    return find(FindOne, id.toString());
+}
+
+RecordList Resource::find(FindMulti style, const QString &from, const QList<Param> &params) const
+{
+    Q_UNUSED(style);
+
+    QUrl url = d->url;
+
+    foreach(Param param, params)
+    {
+        if(!param.isNull())
+        {
+            url.addQueryItem(param.key(), param.value());
+        }
+    }
+
+    if(!from.isEmpty())
+    {
+        url.setPath(url.path() + "/" + from);
+    }
+
+    return fetch(url);
+}
+
+Record Resource::find(FindSingle style, const QString &from, const QList<Param> &params) const
+{
+    QUrl url = d->url;
+
+    foreach(Param param, params)
+    {
+        if(!param.isNull())
+        {
+            url.addQueryItem(param.key(), param.value());
+        }
+    }
+
+    if(!from.isEmpty())
+    {
+        url.setPath(url.path() + "/" + from);
+    }
+
+    switch(style)
+    {
+    case FindOne:
+    case FindFirst:
+    {
+        RecordList results = find(FindAll, from, params);
+        return results.isEmpty() ? Record() : results.front();
+    }
+    case FindLast:
+    {
+        RecordList results = find(FindAll, from, params);
+        return results.isEmpty() ? Record() : results.back();
+    }
+    }
+
+    return Record();
+}
+
+Record Resource::find(FindSingle style, const QString &from,
+                      const Param &first, const Param &second,
+                      const Param &third, const Param &fourth) const
+{
+    return find(style, from, QList<Param>() << first << second << third << fourth);
+}
+
+RecordList Resource::find(FindMulti style, const QString &from,
+                          const Param &first, const Param &second,
+                          const Param &third, const Param &fourth) const
+{
+    return find(style, from, QList<Param>() << first << second << third << fourth);
 }

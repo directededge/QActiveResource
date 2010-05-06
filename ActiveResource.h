@@ -12,6 +12,12 @@ namespace ActiveResource
     typedef QHash<QString, QVariant> Record;
     typedef QList<Record> RecordList;
 
+    /*!
+     * Used as parameters to Resource::find() to specify additional constraints.
+     * These correspond to the options passed in the options hash in the Ruby
+     * equivalent.
+     */
+
     class Param
     {
     public:
@@ -24,13 +30,18 @@ namespace ActiveResource
     private:
         struct Data : public QSharedData
         {
-            Data(const QString &k, const QString &v) : key(k), value(v) {}
+            Data(const QString &key, const QString &value);
             QString key;
             QString value;
         };
 
         QSharedDataPointer<Data> d;
     };
+
+    /*!
+     * Used with Resource::find() to specify that only one record should be
+     * returned.
+     */
 
     enum FindSingle
     {
@@ -39,14 +50,34 @@ namespace ActiveResource
         FindLast,
     };
 
+    /*!
+     * Used with Resource::find() to specify that multiple records should be
+     * returned.
+     */
+
     enum FindMulti
     {
         FindAll
     };
 
+    /*!
+     * Represents an ActiveResource resource.  The semantics are similar to Ruby's
+     * ActiveResource::Base, however, instead of subclassing the class, the base
+     * and resource name are provided in the constructor.
+     */
+
     class Resource
     {
     public:
+        /*!
+         * Instantiates a resource starting at \a base using \a resource.
+         * Authentication info may be included in the URL.
+         *
+         * For example:
+         *
+         *   - Base: "http://www.someshop.com/"
+         *   - Resource: "products"
+         */
         Resource(const QUrl &base, const QString &resource = QString());
 
         /*!
@@ -83,15 +114,9 @@ namespace ActiveResource
                         const Param &first = Param(), const Param &second = Param(),
                         const Param &third = Param(), const Param &fourth = Param()) const;
     private:
-        RecordList find(QUrl url) const;
-        QUrl url() const;
-
         struct Data : public QSharedData
         {
-            Data(const QUrl &b, const QString &r) : base(b), resource(r), url(base)
-            {
-                url.setPath(url.path() + "/" + resource);
-            }
+            Data(const QUrl &base, const QString &resource);
             QUrl base;
             QString resource;
             QUrl url;
