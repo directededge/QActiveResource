@@ -1,8 +1,8 @@
 require 'mkmf'
 dir_config("QAR")
 
-$INCFLAGS << " -I.."
-$LIBS << " -L.. -lActiveResource"
+$CFLAGS << " -I/usr/local/include"
+$LIBS << " -lqactiveresource"
 
 qt_dir = File.readlink(`which qmake`.chomp).sub('/bin/qmake', '')
 

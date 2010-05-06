@@ -2,14 +2,14 @@
  * Copyright (C) 2010, Directed Edge, Inc.
  */
 
-#include "ActiveResource.h"
+#include "QActiveResource.h"
 #include <QXmlStreamReader>
 #include <QStringList>
 #include <QDateTime>
 #include <QDebug>
 #include <curl/curl.h>
 
-using namespace ActiveResource;
+using namespace QActiveResource;
 
 static size_t writer(void *ptr, size_t size, size_t nmemb, void *stream)
 {

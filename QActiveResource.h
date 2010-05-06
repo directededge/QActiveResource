@@ -7,7 +7,7 @@
 #include <QHash>
 #include <QVariant>
 
-namespace ActiveResource
+namespace QActiveResource
 {
     typedef QHash<QString, QVariant> Record;
     typedef QList<Record> RecordList;

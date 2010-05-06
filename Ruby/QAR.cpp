@@ -1,6 +1,6 @@
-#include <ruby.h>
+#include <QActiveResource.h>
 
-#include "ActiveResource.h"
+#include <ruby.h>
 
 extern "C"
 {
@@ -9,26 +9,26 @@ extern "C"
     static VALUE rb_mQAR;
     static VALUE rb_cQARResource;
 
-    static void resource_mark(ActiveResource::Resource *resource)
+    static void resource_mark(QActiveResource::Resource *resource)
     {
 
     }
 
-    static void resource_free(ActiveResource::Resource *resource)
+    static void resource_free(QActiveResource::Resource *resource)
     {
         delete resource;
     }
 
     static VALUE resource_allocate(VALUE klass)
     {
-        ActiveResource::Resource *resource = new ActiveResource::Resource;
+        QActiveResource::Resource *resource = new QActiveResource::Resource;
         return Data_Wrap_Struct(klass, resource_mark, resource_free, resource);
     }
 
     static VALUE resource_initialize(VALUE self, VALUE base, VALUE resource)
     {
-        ActiveResource::Resource *r = 0;
-        Data_Get_Struct(self, class ActiveResource::Resource, r);
+        QActiveResource::Resource *r = 0;
+        Data_Get_Struct(self, class QActiveResource::Resource, r);
         r->setBase(QString::fromUtf8(rb_string_value_ptr(&base)));
         r->setResource(QString::fromUtf8(rb_string_value_ptr(&resource)));
     }
@@ -74,10 +74,10 @@ extern "C"
 
     static VALUE resource_find(VALUE self)
     {
-        ActiveResource::Resource *resource = 0;
-        Data_Get_Struct(self, class ActiveResource::Resource, resource);
+        QActiveResource::Resource *resource = 0;
+        Data_Get_Struct(self, class QActiveResource::Resource, resource);
 
-        ActiveResource::RecordList records = resource->find();
+        QActiveResource::RecordList records = resource->find();
 
         VALUE array = rb_ary_new2(records.length());
 
