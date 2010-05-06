@@ -261,7 +261,7 @@ void Resource::setResource(const QString &resource)
     d->setUrl();
 }
 
-Record Resource::find(QVariant id) const
+Record Resource::find(const QVariant &id) const
 {
     return find(FindOne, id.toString());
 }

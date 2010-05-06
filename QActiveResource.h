@@ -93,7 +93,7 @@ namespace QActiveResource
         /*!
          * \return The record with the given text / numeric ID.
          */
-        Record find(QVariant id) const;
+        Record find(const QVariant &id) const;
 
         /*!
          * Finds a record using \a style.  \a from specifies a specific resource that
