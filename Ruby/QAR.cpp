@@ -48,7 +48,7 @@ extern "C"
 
             for(QHash<QString, QVariant>::ConstIterator it = hash.begin(); it != hash.end(); ++it)
             {
-                rb_hash_aset(value, rb_str_new2(it.key().toUtf8()), to_value(it.value()));
+                rb_hash_aset(value, ID2SYM(rb_intern(it.key().toUtf8())), to_value(it.value()));
             }
 
             return value;
