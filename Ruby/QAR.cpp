@@ -77,10 +77,37 @@ extern "C"
         }
     }
 
-    static VALUE resource_find(VALUE self)
+    static VALUE resource_find(int argc, VALUE *argv, VALUE self)
     {
         QActiveResource::Resource *resource = 0;
         Data_Get_Struct(self, class QActiveResource::Resource, resource);
+
+        if(argc >= 1)
+        {
+            static const ID one = rb_intern("one");
+            static const ID first = rb_intern("first");
+            static const ID last = rb_intern("last");
+            static const ID all = rb_intern("all");
+
+            ID current = SYM2ID(argv[0]);
+
+            if(current == one)
+            {
+                return to_value(resource->find(QActiveResource::FindOne));
+            }
+            else if(current == first)
+            {
+                return to_value(resource->find(QActiveResource::FindFirst));
+            }
+            else if(current == last)
+            {
+                return to_value(resource->find(QActiveResource::FindLast));
+            }
+            else if(current != all)
+            {
+                return to_value(resource->find(QString::fromUtf8(StringValuePtr(argv[0]))));
+            }
+        }
 
         QActiveResource::RecordList records = resource->find();
 
@@ -100,6 +127,6 @@ extern "C"
         rb_cQARResource = rb_define_class_under(rb_mQAR, "Resource", rb_cObject);
         rb_define_alloc_func(rb_cQARResource, resource_allocate);
         rb_define_method(rb_cQARResource, "initialize", (ARGS) resource_initialize, 2);
-        rb_define_method(rb_cQARResource, "find", (ARGS) resource_find, 0);
+        rb_define_method(rb_cQARResource, "find", (ARGS) resource_find, -1);
     }
 }
