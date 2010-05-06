@@ -98,7 +98,7 @@ static QVariant reader(QXmlStreamReader &xml, bool advance = true)
             {
                 record[xml.name().toString()] = QVariant();
             }
-            else if(advance)
+            else if(advance && xml.name() != firstElement)
             {
                 QVariant value;
                 QString text = xml.readElementText();
