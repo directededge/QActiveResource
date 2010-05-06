@@ -63,7 +63,7 @@ static QVariant::Type lookupType(const QString &name)
 static QVariant reader(QXmlStreamReader &xml, bool advance = true)
 {
     Record record;
-    QStringRef firstElement;
+    QString firstElement;
 
     while(!xml.atEnd())
     {
@@ -75,12 +75,14 @@ static QVariant reader(QXmlStreamReader &xml, bool advance = true)
         {
             if(firstElement.isNull())
             {
-                firstElement = xml.name();
+                firstElement = xml.name().toString();
             }
 
-            if(xml.attributes().value("type") == "array")
+            QString type = xml.attributes().value("type").toString();
+
+            if(type == "array")
             {
-                QStringRef name = xml.name();
+                QString name = xml.name().toString();
                 QList<QVariant> array;
 
                 while(xml.readNext() == QXmlStreamReader::StartElement ||
@@ -92,7 +94,7 @@ static QVariant reader(QXmlStreamReader &xml, bool advance = true)
                     }
                 }
 
-                record[name.toString()] = array;
+                record[name] = array;
             }
             else if(xml.attributes().value("nil") == "true")
             {
@@ -103,7 +105,7 @@ static QVariant reader(QXmlStreamReader &xml, bool advance = true)
                 QVariant value;
                 QString text = xml.readElementText();
 
-                switch(lookupType(xml.attributes().value("type").toString()))
+                switch(lookupType(type))
                 {
                 case QVariant::Int:
                     value = text.toInt();
