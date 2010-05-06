@@ -80,7 +80,14 @@ namespace QActiveResource
          */
         Resource(const QUrl &base = QUrl(), const QString &resource = QString());
 
+        /*!
+         * Sets the base URL of the resource to \a base.
+         */
         void setBase(const QUrl &base);
+
+        /*!
+         * Sets the resource (i.e. "customers") of the object.
+         */
         void setResource(const QString &resource);
 
         /*!
