@@ -64,6 +64,8 @@ extern "C"
 
             return value;
         }
+        case QVariant::Invalid:
+            return Qnil;
         case QVariant::Bool:
             return v.toBool() ? Qtrue : Qfalse;
         case QVariant::Int:
