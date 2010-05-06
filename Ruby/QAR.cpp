@@ -89,11 +89,18 @@ extern "C"
         }
     }
 
+    static QString to_s(VALUE value)
+    {
+        static const ID id = rb_intern("to_s");
+        VALUE s = rb_funcall(value, id, 0);
+        return QString::fromUtf8(StringValuePtr(s));
+    }
+
     static int hash_iterator(VALUE key, VALUE value, VALUE params)
     {
         QList<QActiveResource::Param> *params_pointer;
         Data_Get_Struct(params, class QList<QActiveResource::Param>, params_pointer);
-        params_pointer->append(QActiveResource::Param(StringValuePtr(key), StringValuePtr(value)));
+        params_pointer->append(QActiveResource::Param(to_s(key), to_s(value)));
     }
 
     static VALUE resource_find(int argc, VALUE *argv, VALUE self)
@@ -143,7 +150,7 @@ extern "C"
             }
             else if(current != all)
             {
-                return to_value(resource->find(QString::fromUtf8(StringValuePtr(argv[0]))));
+                return to_value(resource->find(to_s(argv[0])));
             }
         }
 
