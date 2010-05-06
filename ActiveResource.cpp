@@ -236,6 +236,16 @@ Resource::Resource(const QUrl &base, const QString &resource) :
 
 }
 
+void Resource::setBase(const QUrl &url)
+{
+    d->url = url;
+}
+
+void Resource::setResource(const QString &resource)
+{
+    d->resource = resource;
+}
+
 Record Resource::find(QVariant id) const
 {
     return find(FindOne, id.toString());

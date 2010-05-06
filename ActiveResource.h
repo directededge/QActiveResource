@@ -78,7 +78,10 @@ namespace ActiveResource
          *   - Base: "http://www.someshop.com/"
          *   - Resource: "products"
          */
-        Resource(const QUrl &base, const QString &resource = QString());
+        Resource(const QUrl &base = QUrl(), const QString &resource = QString());
+
+        void setBase(const QUrl &base);
+        void setResource(const QString &resource);
 
         /*!
          * \return The record with the given text / numeric ID.
