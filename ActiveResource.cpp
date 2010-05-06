@@ -223,7 +223,13 @@ Resource::Data::Data(const QUrl &b, const QString &r) :
     resource(r),
     url(base)
 {
-    url.setPath(url.path() + "/" + resource);
+    setUrl();
+}
+
+void Resource::Data::setUrl()
+{
+    url = base;
+    url.setPath(base.path() + "/" + resource);
 }
 
 /*
@@ -236,14 +242,16 @@ Resource::Resource(const QUrl &base, const QString &resource) :
 
 }
 
-void Resource::setBase(const QUrl &url)
+void Resource::setBase(const QUrl &base)
 {
-    d->url = url;
+    d->base = base;
+    d->setUrl();
 }
 
 void Resource::setResource(const QString &resource)
 {
     d->resource = resource;
+    d->setUrl();
 }
 
 Record Resource::find(QVariant id) const

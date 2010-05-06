@@ -120,6 +120,7 @@ namespace ActiveResource
         struct Data : public QSharedData
         {
             Data(const QUrl &base, const QString &resource);
+            void setUrl();
             QUrl base;
             QString resource;
             QUrl url;
