@@ -8,14 +8,13 @@
 extern "C"
 {
     typedef VALUE(*ARGS)(...);
+    typedef int (*ITERATOR)(...);
 
     static VALUE rb_mQAR;
+    static VALUE rb_cQARParamList;
     static VALUE rb_cQARResource;
 
-    static void resource_mark(QActiveResource::Resource *resource)
-    {
-
-    }
+    static void resource_mark(QActiveResource::Resource *resource) {}
 
     static void resource_free(QActiveResource::Resource *resource)
     {
@@ -34,6 +33,19 @@ extern "C"
         Data_Get_Struct(self, class QActiveResource::Resource, r);
         r->setBase(QString::fromUtf8(rb_string_value_ptr(&base)));
         r->setResource(QString::fromUtf8(rb_string_value_ptr(&resource)));
+    }
+
+    static VALUE param_list_mark(QList<QActiveResource::Param> *) {}
+
+    static VALUE param_list_free(QList<QActiveResource::Param> *params)
+    {
+        delete params;
+    }
+
+    static VALUE param_list_allocate(VALUE klass)
+    {
+        QList<QActiveResource::Param> *params = new QList<QActiveResource::Param>();
+        return Data_Wrap_Struct(klass, param_list_mark, param_list_free, params);
     }
 
     static VALUE to_value(const QVariant &v)
@@ -77,10 +89,36 @@ extern "C"
         }
     }
 
+    static int hash_iterator(VALUE key, VALUE value, VALUE params)
+    {
+        QList<QActiveResource::Param> *params_pointer;
+        Data_Get_Struct(params, class QList<QActiveResource::Param>, params_pointer);
+        params_pointer->append(QActiveResource::Param(StringValuePtr(key), StringValuePtr(value)));
+    }
+
     static VALUE resource_find(int argc, VALUE *argv, VALUE self)
     {
         QActiveResource::Resource *resource = 0;
         Data_Get_Struct(self, class QActiveResource::Resource, resource);
+
+        VALUE params = param_list_allocate(rb_cData);
+
+        if(argc >= 2 && TYPE(argv[1]) == T_HASH)
+        {
+            static const VALUE params_symbol = ID2SYM(rb_intern("params"));
+
+            VALUE params_hash = rb_hash_aref(argv[1], params_symbol);
+
+            if(params_hash != Qnil)
+            {
+                rb_hash_foreach(params_hash, (ITERATOR) hash_iterator, params);
+            }
+        }
+
+        QList<QActiveResource::Param> *params_pointer;
+        Data_Get_Struct(params, class QList<QActiveResource::Param>, params_pointer);
+
+        QString from;
 
         if(argc >= 1)
         {
@@ -93,15 +131,15 @@ extern "C"
 
             if(current == one)
             {
-                return to_value(resource->find(QActiveResource::FindOne));
+                return to_value(resource->find(QActiveResource::FindOne, from, *params_pointer));
             }
             else if(current == first)
             {
-                return to_value(resource->find(QActiveResource::FindFirst));
+                return to_value(resource->find(QActiveResource::FindFirst, from, *params_pointer));
             }
             else if(current == last)
             {
-                return to_value(resource->find(QActiveResource::FindLast));
+                return to_value(resource->find(QActiveResource::FindLast, from, *params_pointer));
             }
             else if(current != all)
             {
@@ -109,7 +147,8 @@ extern "C"
             }
         }
 
-        QActiveResource::RecordList records = resource->find();
+        QActiveResource::RecordList records =
+            resource->find(QActiveResource::FindAll, from, *params_pointer);
 
         VALUE array = rb_ary_new2(records.length());
 
@@ -124,6 +163,10 @@ extern "C"
     void Init_QAR(void)
     {
         rb_mQAR = rb_define_module("QAR");
+
+        rb_cQARParamList = rb_define_class_under(rb_mQAR, "ParamList", rb_cObject);
+        rb_define_alloc_func(rb_cQARParamList, param_list_allocate);
+
         rb_cQARResource = rb_define_class_under(rb_mQAR, "Resource", rb_cObject);
         rb_define_alloc_func(rb_cQARResource, resource_allocate);
         rb_define_method(rb_cQARResource, "initialize", (ARGS) resource_initialize, 2);
