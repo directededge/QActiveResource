@@ -60,6 +60,11 @@ static QVariant::Type lookupType(const QString &name)
     return types.contains(name) ? types[name] : QVariant::String;
 }
 
+static void assign(Record *record, QString name, const QVariant &value)
+{
+    (*record)[name.replace('-', '_')] = value;
+}
+
 static QVariant reader(QXmlStreamReader &xml, bool advance = true)
 {
     Record record;
@@ -94,11 +99,11 @@ static QVariant reader(QXmlStreamReader &xml, bool advance = true)
                     }
                 }
 
-                record[name] = array;
+                assign(&record, name, array);
             }
             else if(xml.attributes().value("nil") == "true")
             {
-                record[xml.name().toString()] = QVariant();
+                assign(&record, xml.name().toString(), QVariant());
             }
             else if(advance && xml.name() != firstElement)
             {
@@ -123,7 +128,7 @@ static QVariant reader(QXmlStreamReader &xml, bool advance = true)
                     value = text;
                 }
 
-                record[xml.name().toString()] = value;
+                assign(&record, xml.name().toString(), value);
             }
         }
         if(xml.tokenType() == QXmlStreamReader::EndElement &&
