@@ -1,0 +1,18 @@
+#!/usr/bin/ruby
+
+ENV['AR_BASE'] = 'http://localhost/'
+ENV['AR_RESOURCE'] = 'tests'
+ENV['AR_FIELD'] = 'title'
+
+def bench(title, command)
+  puts title
+  (1..3).each { system "time #{command} > /dev/null 2>&1" }
+  puts "================"
+end
+
+puts "================"
+
+bench "Ruby / REXML", "./benchmark-rexml.rb"
+bench "Ruby / Nokogiri", "./benchmark-nokogiri.rb"
+bench "C++ / QAR", "./benchmark"
+bench "Ruby / QAR", "./benchmark-qar.rb"

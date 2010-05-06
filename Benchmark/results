@@ -1,0 +1,57 @@
+================
+Ruby / REXML
+
+real	0m32.334s
+user	0m30.403s
+sys	0m1.589s
+
+real	0m34.025s
+user	0m32.010s
+sys	0m1.659s
+
+real	0m37.444s
+user	0m35.223s
+sys	0m1.817s
+================
+Ruby / Nokogiri
+
+real	0m12.970s
+user	0m12.092s
+sys	0m0.688s
+
+real	0m12.967s
+user	0m12.055s
+sys	0m0.657s
+
+real	0m12.674s
+user	0m11.878s
+sys	0m0.648s
+================
+C++ / QAR
+
+real	0m0.802s
+user	0m0.659s
+sys	0m0.078s
+
+real	0m0.793s
+user	0m0.662s
+sys	0m0.077s
+
+real	0m0.782s
+user	0m0.652s
+sys	0m0.077s
+================
+Ruby / QAR
+
+real	0m1.055s
+user	0m0.918s
+sys	0m0.085s
+
+real	0m1.058s
+user	0m0.919s
+sys	0m0.085s
+
+real	0m1.057s
+user	0m0.916s
+sys	0m0.086s
+================

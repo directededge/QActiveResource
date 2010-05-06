@@ -1,0 +1,887 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products type="array">
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-10-28T23:48:41-04:00</created-at>
+    <handle>beer</handle>
+    <id type="integer">10256072</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2010-01-15T02:21:16-05:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>Beer &#248;</title>
+    <updated-at type="datetime">2010-02-25T23:43:40-05:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags>recommend</tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-10-28T23:48:41-04:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">0</grams>
+        <id type="integer">26359912</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">10256072</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-10-28T23:48:41-04:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2009-12-11T22:23:09-05:00</created-at>
+        <id type="integer">23617182</id>
+        <position type="integer">1</position>
+        <product-id type="integer">10256072</product-id>
+        <updated-at type="datetime">2009-12-11T22:23:09-05:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/element_1_large_1.jpg?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-10-28T23:49:14-04:00</created-at>
+    <handle>books</handle>
+    <id type="integer">10256092</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2009-10-28T23:49:14-04:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>Books</title>
+    <updated-at type="datetime">2009-10-28T23:49:14-04:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags></tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-10-28T23:49:14-04:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">0</grams>
+        <id type="integer">26359932</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">10256092</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-10-28T23:49:14-04:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2009-10-28T23:49:18-04:00</created-at>
+        <id type="integer">20677822</id>
+        <position type="integer">1</position>
+        <product-id type="integer">10256092</product-id>
+        <updated-at type="datetime">2009-10-28T23:49:18-04:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/books.jpeg?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-10-28T23:49:36-04:00</created-at>
+    <handle>cds</handle>
+    <id type="integer">10256102</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2009-10-28T23:49:36-04:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>CDs</title>
+    <updated-at type="datetime">2009-10-28T23:49:36-04:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags></tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-10-28T23:49:36-04:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">0</grams>
+        <id type="integer">26359942</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">10256102</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-10-28T23:49:36-04:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2009-10-28T23:49:40-04:00</created-at>
+        <id type="integer">20677842</id>
+        <position type="integer">1</position>
+        <product-id type="integer">10256102</product-id>
+        <updated-at type="datetime">2009-10-28T23:49:40-04:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/cds.jpeg?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-10-28T23:50:04-04:00</created-at>
+    <handle>coffee</handle>
+    <id type="integer">10256142</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2009-10-28T23:50:04-04:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>Coffee &gt; Everything</title>
+    <updated-at type="datetime">2010-02-05T23:25:39-05:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags></tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-10-28T23:50:04-04:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">0</grams>
+        <id type="integer">26359962</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">10256142</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-10-28T23:50:04-04:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2009-10-28T23:50:07-04:00</created-at>
+        <id type="integer">20677882</id>
+        <position type="integer">1</position>
+        <product-id type="integer">10256142</product-id>
+        <updated-at type="datetime">2009-10-28T23:50:07-04:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/coffee.jpeg?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-10-28T23:50:28-04:00</created-at>
+    <handle>cola</handle>
+    <id type="integer">10256152</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2009-10-28T23:50:28-04:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>Cola</title>
+    <updated-at type="datetime">2010-02-06T08:38:21-05:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags>featured</tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-10-28T23:50:28-04:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">0</grams>
+        <id type="integer">26359972</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">10256152</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-10-28T23:50:28-04:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2009-10-28T23:50:31-04:00</created-at>
+        <id type="integer">20677892</id>
+        <position type="integer">1</position>
+        <product-id type="integer">10256152</product-id>
+        <updated-at type="datetime">2009-10-28T23:50:31-04:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/cola.jpeg?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-11-27T18:07:51-05:00</created-at>
+    <handle>computer-speakers</handle>
+    <id type="integer">11159902</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2009-11-27T18:07:51-05:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>Computer Speakers</title>
+    <updated-at type="datetime">2009-11-27T18:07:51-05:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags></tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-11-27T18:07:51-05:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">0</grams>
+        <id type="integer">28503402</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">11159902</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-11-27T18:07:51-05:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2009-11-27T18:07:54-05:00</created-at>
+        <id type="integer">22588632</id>
+        <position type="integer">1</position>
+        <product-id type="integer">11159902</product-id>
+        <updated-at type="datetime">2009-11-27T18:07:54-05:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/images_2.jpeg?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-10-24T20:35:56-04:00</created-at>
+    <handle>desktop-of-death</handle>
+    <id type="integer">10126612</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2009-10-24T20:35:56-04:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>Desktop</title>
+    <updated-at type="datetime">2009-11-27T16:18:20-05:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags>ofdeath</tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-10-24T20:35:56-04:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">1361</grams>
+        <id type="integer">26082772</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">10126612</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-10-24T21:12:59-04:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2009-11-27T16:18:06-05:00</created-at>
+        <id type="integer">22585342</id>
+        <position type="integer">1</position>
+        <product-id type="integer">10126612</product-id>
+        <updated-at type="datetime">2009-11-27T16:18:06-05:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/images.jpeg?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-10-28T23:50:58-04:00</created-at>
+    <handle>dvds</handle>
+    <id type="integer">10256162</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2009-10-28T23:50:58-04:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>DVDs</title>
+    <updated-at type="datetime">2009-10-28T23:50:58-04:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags></tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-10-28T23:50:59-04:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">0</grams>
+        <id type="integer">26359982</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">10256162</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-10-28T23:50:59-04:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2009-10-28T23:51:03-04:00</created-at>
+        <id type="integer">20677912</id>
+        <position type="integer">1</position>
+        <product-id type="integer">10256162</product-id>
+        <updated-at type="datetime">2009-10-28T23:51:03-04:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/dvd.jpeg?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-10-28T23:51:21-04:00</created-at>
+    <handle>hamburger</handle>
+    <id type="integer">10256192</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2009-10-28T23:51:21-04:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>Hamburger</title>
+    <updated-at type="datetime">2009-10-28T23:51:21-04:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags></tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-10-28T23:51:21-04:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">0</grams>
+        <id type="integer">26360002</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">10256192</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-10-28T23:51:21-04:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2009-10-28T23:51:24-04:00</created-at>
+        <id type="integer">20677932</id>
+        <position type="integer">1</position>
+        <product-id type="integer">10256192</product-id>
+        <updated-at type="datetime">2009-10-28T23:51:24-04:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/hamburger.jpeg?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-10-28T23:51:53-04:00</created-at>
+    <handle>hotdog</handle>
+    <id type="integer">10256202</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2009-10-28T23:51:53-04:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>Hotdog</title>
+    <updated-at type="datetime">2009-10-28T23:51:53-04:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags></tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-10-28T23:51:53-04:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">0</grams>
+        <id type="integer">26360012</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">10256202</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-10-28T23:51:53-04:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2009-10-28T23:51:56-04:00</created-at>
+        <id type="integer">20677962</id>
+        <position type="integer">1</position>
+        <product-id type="integer">10256202</product-id>
+        <updated-at type="datetime">2009-10-28T23:51:56-04:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/hotdog.jpeg?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-10-28T23:53:28-04:00</created-at>
+    <handle>iphone</handle>
+    <id type="integer">10256232</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2009-10-28T23:53:28-04:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>iPhone</title>
+    <updated-at type="datetime">2010-01-19T06:51:53-05:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags>featured</tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-10-28T23:53:28-04:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">0</grams>
+        <id type="integer">26360082</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">10256232</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-10-28T23:53:28-04:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2009-10-28T23:53:31-04:00</created-at>
+        <id type="integer">20678072</id>
+        <position type="integer">1</position>
+        <product-id type="integer">10256232</product-id>
+        <updated-at type="datetime">2009-10-28T23:53:31-04:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/iphone.jpeg?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-10-28T23:54:07-04:00</created-at>
+    <handle>laptop</handle>
+    <id type="integer">10256242</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2009-10-28T23:54:07-04:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>Laptop</title>
+    <updated-at type="datetime">2009-10-28T23:54:07-04:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags></tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-10-28T23:54:07-04:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">0</grams>
+        <id type="integer">26360402</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">10256242</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-10-28T23:54:07-04:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2009-10-28T23:54:11-04:00</created-at>
+        <id type="integer">20678122</id>
+        <position type="integer">1</position>
+        <product-id type="integer">10256242</product-id>
+        <updated-at type="datetime">2009-10-28T23:54:11-04:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/laptop.jpeg?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-10-28T23:54:53-04:00</created-at>
+    <handle>mp3-player</handle>
+    <id type="integer">10256262</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2009-10-28T23:54:53-04:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>MP3 Player</title>
+    <updated-at type="datetime">2009-10-28T23:54:53-04:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags></tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-10-28T23:54:53-04:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">0</grams>
+        <id type="integer">26360432</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">10256262</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-10-28T23:54:53-04:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2009-10-28T23:54:56-04:00</created-at>
+        <id type="integer">20678172</id>
+        <position type="integer">1</position>
+        <product-id type="integer">10256262</product-id>
+        <updated-at type="datetime">2009-10-28T23:54:56-04:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/mp3player.jpg?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-10-28T23:55:40-04:00</created-at>
+    <handle>phone</handle>
+    <id type="integer">10256282</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2009-10-28T23:55:40-04:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>Phone</title>
+    <updated-at type="datetime">2009-10-28T23:55:40-04:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags></tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-10-28T23:55:40-04:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">0</grams>
+        <id type="integer">26360462</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">10256282</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-10-28T23:55:40-04:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2009-10-28T23:55:43-04:00</created-at>
+        <id type="integer">20678302</id>
+        <position type="integer">1</position>
+        <product-id type="integer">10256282</product-id>
+        <updated-at type="datetime">2009-10-28T23:55:43-04:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/phone.jpeg?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-11-27T18:08:26-05:00</created-at>
+    <handle>printer</handle>
+    <id type="integer">11159922</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2009-11-27T18:08:26-05:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>Printer</title>
+    <updated-at type="datetime">2010-01-19T06:52:17-05:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags>featured</tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-11-27T18:08:26-05:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">0</grams>
+        <id type="integer">28503422</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">11159922</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-11-27T18:08:26-05:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2009-11-27T18:08:29-05:00</created-at>
+        <id type="integer">22588662</id>
+        <position type="integer">1</position>
+        <product-id type="integer">11159922</product-id>
+        <updated-at type="datetime">2009-11-27T18:08:29-05:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/images_1.jpeg?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-10-29T00:05:36-04:00</created-at>
+    <handle>red-bull</handle>
+    <id type="integer">10256362</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2009-10-29T00:05:36-04:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>Red Bull</title>
+    <updated-at type="datetime">2009-10-29T00:05:36-04:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags></tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-10-29T00:05:36-04:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">0</grams>
+        <id type="integer">26360592</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">10256362</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-10-29T00:05:36-04:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2010-02-06T08:42:56-05:00</created-at>
+        <id type="integer">26920482</id>
+        <position type="integer">1</position>
+        <product-id type="integer">10256362</product-id>
+        <updated-at type="datetime">2010-02-06T08:42:56-05:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/red-bull-simply-cola-12-oz.gif?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+  <product>
+    <body-html></body-html>
+    <created-at type="datetime">2009-10-29T00:08:38-04:00</created-at>
+    <handle>router</handle>
+    <id type="integer">10256392</id>
+    <product-type>Hardware</product-type>
+    <published-at type="datetime">2009-10-29T00:08:38-04:00</published-at>
+    <template-suffix nil="true"></template-suffix>
+    <title>Router</title>
+    <updated-at type="datetime">2010-01-19T06:52:37-05:00</updated-at>
+    <vendor>Shopify</vendor>
+    <tags>featured</tags>
+    <body></body>
+    <variants type="array">
+      <variant>
+        <compare-at-price type="decimal" nil="true"></compare-at-price>
+        <created-at type="datetime">2009-10-29T00:08:38-04:00</created-at>
+        <fulfillment-service>manual</fulfillment-service>
+        <grams type="integer">0</grams>
+        <id type="integer">26360622</id>
+        <inventory-management></inventory-management>
+        <inventory-policy>deny</inventory-policy>
+        <inventory-quantity type="integer">1</inventory-quantity>
+        <option1>Default</option1>
+        <option2 nil="true"></option2>
+        <option3 nil="true"></option3>
+        <position type="integer">1</position>
+        <price type="decimal">0.00</price>
+        <product-id type="integer">10256392</product-id>
+        <requires-shipping type="boolean">true</requires-shipping>
+        <sku></sku>
+        <taxable type="boolean">true</taxable>
+        <title>Default</title>
+        <updated-at type="datetime">2009-10-29T00:08:38-04:00</updated-at>
+      </variant>
+    </variants>
+    <images type="array">
+      <image>
+        <created-at type="datetime">2009-10-29T00:08:42-04:00</created-at>
+        <id type="integer">20679292</id>
+        <position type="integer">1</position>
+        <product-id type="integer">10256392</product-id>
+        <updated-at type="datetime">2009-10-29T00:08:42-04:00</updated-at>
+        <src>http://static.shopify.com/s/files/1/0037/2212/products/router.jpeg?1272773216</src>
+      </image>
+    </images>
+    <options type="array">
+      <option>
+        <name>Title</name>
+      </option>
+    </options>
+  </product>
+</products>
