@@ -18,7 +18,62 @@ extern "C"
     static VALUE rb_cQARParamList;
     static VALUE rb_cQARResource;
 
-    static QString to_s(VALUE value);
+    /*
+     * helper functions
+     */
+
+    static QString to_s(VALUE value)
+    {
+        static const ID id = rb_intern("to_s");
+        VALUE s = rb_funcall(value, id, 0);
+        return QString::fromUtf8(StringValuePtr(s));
+    }
+
+    static VALUE to_value(const QVariant &v)
+    {
+        switch(v.type())
+        {
+        case QVariant::Hash:
+        {
+            VALUE value = rb_hash_new();
+
+            QHash<QString, QVariant> hash = v.toHash();
+
+            for(QHash<QString, QVariant>::ConstIterator it = hash.begin(); it != hash.end(); ++it)
+            {
+                rb_hash_aset(value, ID2SYM(rb_intern(it.key().toUtf8())), to_value(it.value()));
+            }
+
+            return value;
+        }
+        case QVariant::List:
+        {
+            VALUE value = rb_ary_new();
+
+            foreach(QVariant element, v.toList())
+            {
+                rb_ary_push(value, to_value(element));
+            }
+
+            return value;
+        }
+        case QVariant::Invalid:
+            return Qnil;
+        case QVariant::Bool:
+            return v.toBool() ? Qtrue : Qfalse;
+        case QVariant::Int:
+            return rb_int_new(v.toInt());
+        case QVariant::Double:
+            return rb_float_new(v.toDouble());
+        case QVariant::DateTime:
+        {
+            static const ID at = rb_intern("at");
+            return rb_funcall(rb_cTime, at, 1, rb_int_new(v.toDateTime().toTime_t()));
+        }
+        default:
+            return rb_str_new2(v.toString().toUtf8());
+        }
+    }
 
     /*
      * Hash
@@ -27,6 +82,7 @@ extern "C"
     static VALUE hash_method_missing(VALUE self, VALUE method)
     {
         VALUE value = rb_hash_aref(self, method);
+
 
         if(value == Qnil)
         {
@@ -77,60 +133,7 @@ extern "C"
         return Data_Wrap_Struct(klass, param_list_mark, param_list_free, params);
     }
 
-    static VALUE to_value(const QVariant &v)
-    {
-        switch(v.type())
-        {
-        case QVariant::Hash:
-        {
-            VALUE value = rb_hash_new();
-
-            QHash<QString, QVariant> hash = v.toHash();
-
-            for(QHash<QString, QVariant>::ConstIterator it = hash.begin(); it != hash.end(); ++it)
-            {
-                rb_hash_aset(value, ID2SYM(rb_intern(it.key().toUtf8())), to_value(it.value()));
-            }
-
-            return value;
-        }
-        case QVariant::List:
-        {
-            VALUE value = rb_ary_new();
-
-            foreach(QVariant element, v.toList())
-            {
-                rb_ary_push(value, to_value(element));
-            }
-
-            return value;
-        }
-        case QVariant::Invalid:
-            return Qnil;
-        case QVariant::Bool:
-            return v.toBool() ? Qtrue : Qfalse;
-        case QVariant::Int:
-            return rb_int_new(v.toInt());
-        case QVariant::Double:
-            return rb_float_new(v.toDouble());
-        case QVariant::DateTime:
-        {
-            static const ID at = rb_intern("at");
-            return rb_funcall(rb_cTime, at, 1, rb_int_new(v.toDateTime().toTime_t()));
-        }
-        default:
-            return rb_str_new2(v.toString().toUtf8());
-        }
-    }
-
-    static QString to_s(VALUE value)
-    {
-        static const ID id = rb_intern("to_s");
-        VALUE s = rb_funcall(value, id, 0);
-        return QString::fromUtf8(StringValuePtr(s));
-    }
-
-    static int hash_iterator(VALUE key, VALUE value, VALUE params)
+    static int params_hash_iterator(VALUE key, VALUE value, VALUE params)
     {
         QActiveResource::ParamList *params_pointer;
         Data_Get_Struct(params, QActiveResource::ParamList, params_pointer);
@@ -151,7 +154,7 @@ extern "C"
 
             if(params_hash != Qnil)
             {
-                rb_hash_foreach(params_hash, (ITERATOR) hash_iterator, params);
+                rb_hash_foreach(params_hash, (ITERATOR) params_hash_iterator, params);
             }
 
             static const VALUE follow_redirects_symbol = ID2SYM(rb_intern("follow_redirects"));
