@@ -6,6 +6,7 @@
 #include <QActiveResource.h>
 #include <QDateTime>
 #include <ruby.h>
+#include <QDebug>
 
 extern "C"
 {
@@ -13,8 +14,28 @@ extern "C"
     typedef int(*ITERATOR)(...);
 
     static VALUE rb_mQAR;
+    static VALUE rb_cQARHash;
     static VALUE rb_cQARParamList;
     static VALUE rb_cQARResource;
+
+    static QString to_s(VALUE value);
+
+    /*
+     * Hash
+     */
+
+    static VALUE hash_method_missing(VALUE self, VALUE method)
+    {
+        VALUE value = rb_hash_aref(self, method);
+
+        if(value == Qnil)
+        {
+            static const ID symbol = rb_intern("method_missing");
+            return rb_funcall(rb_cHash, symbol, 1, method);
+        }
+
+        return value;
+    }
 
     /*
      * Resource
@@ -186,6 +207,9 @@ extern "C"
     void Init_QAR(void)
     {
         rb_mQAR = rb_define_module("QAR");
+
+        rb_cQARHash = rb_define_class_under(rb_mQAR, "Hash", rb_cHash);
+        rb_define_method(rb_cQARHash, "method_missing", (ARGS) hash_method_missing, 1);
 
         rb_cQARParamList = rb_define_class_under(rb_mQAR, "ParamList", rb_cObject);
         rb_define_alloc_func(rb_cQARParamList, param_list_allocate);
