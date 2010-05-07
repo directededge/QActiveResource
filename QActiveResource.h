@@ -123,6 +123,15 @@ namespace QActiveResource
         RecordList find(FindMulti style = FindAll, const QString &from = QString(),
                         const Param &first = Param(), const Param &second = Param(),
                         const Param &third = Param(), const Param &fourth = Param()) const;
+
+        /*!
+         * Enables following redirects if \a follow is true.
+         *
+         * \warning If authentication information is included, this will be
+         * passed on to the sites where the redirection is sent.
+         */
+        void setFollowRedirects(bool follow);
+
     private:
         struct Data : public QSharedData
         {
@@ -131,6 +140,7 @@ namespace QActiveResource
             QUrl base;
             QString resource;
             QUrl url;
+            bool followRedirects;
         };
 
         QSharedDataPointer<Data> d;

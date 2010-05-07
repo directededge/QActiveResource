@@ -119,13 +119,16 @@ extern "C"
         if(argc >= 2 && TYPE(argv[1]) == T_HASH)
         {
             static const VALUE params_symbol = ID2SYM(rb_intern("params"));
-
             VALUE params_hash = rb_hash_aref(argv[1], params_symbol);
 
             if(params_hash != Qnil)
             {
                 rb_hash_foreach(params_hash, (ITERATOR) hash_iterator, params);
             }
+
+            static const VALUE follow_redirects_symbol = ID2SYM(rb_intern("follow_redirects"));
+            VALUE follow_redirects = rb_hash_aref(argv[1], follow_redirects_symbol);
+            resource->setFollowRedirects(follow_redirects == Qtrue);
         }
 
         QList<QActiveResource::Param> *params_pointer;

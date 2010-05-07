@@ -19,13 +19,7 @@ static size_t writer(void *ptr, size_t size, size_t nmemb, void *stream)
 
 namespace HTTP
 {
-    enum Redirect
-    {
-        FollowRedirects,
-        DoNotFollowRedirects
-    };
-
-    QByteArray get(const QUrl &url, Redirect redirect = DoNotFollowRedirects)
+    QByteArray get(const QUrl &url, bool followRedirects = false)
     {
         QByteArray data;
         CURL *curl = curl_easy_init();
@@ -43,7 +37,7 @@ namespace HTTP
                 curl_easy_setopt(curl, CURLOPT_TIMEOUT, 25);
                 curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
 
-                if(redirect == FollowRedirects)
+                if(followRedirects)
                 {
                     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
                     curl_easy_setopt(curl, CURLOPT_UNRESTRICTED_AUTH, 1);
@@ -168,14 +162,14 @@ static QVariant reader(QXmlStreamReader &xml, bool advance = true)
     return QVariant();
 }
 
-static RecordList fetch(QUrl url)
+static RecordList fetch(QUrl url, bool followRedirects = false)
 {
     if(!url.path().endsWith(".xml"))
     {
         url.setPath(url.path() + ".xml");
     }
 
-    QByteArray data = HTTP::get(url, HTTP::FollowRedirects);
+    QByteArray data = HTTP::get(url, followRedirects);
 
     QXmlStreamReader xml(data);
 
@@ -253,7 +247,8 @@ QString Param::value() const
 Resource::Data::Data(const QUrl &b, const QString &r) :
     base(b),
     resource(r),
-    url(base)
+    url(base),
+    followRedirects(false)
 {
     setUrl();
 }
@@ -310,7 +305,7 @@ RecordList Resource::find(FindMulti style, const QString &from, const QList<Para
         url.setPath(url.path() + "/" + from);
     }
 
-    return fetch(url);
+    return fetch(url, d->followRedirects);
 }
 
 Record Resource::find(FindSingle style, const QString &from, const QList<Param> &params) const
@@ -360,4 +355,9 @@ RecordList Resource::find(FindMulti style, const QString &from,
                           const Param &third, const Param &fourth) const
 {
     return find(style, from, QList<Param>() << first << second << third << fourth);
+}
+
+void Resource::setFollowRedirects(bool followRedirects)
+{
+    d->followRedirects = followRedirects;
 }
