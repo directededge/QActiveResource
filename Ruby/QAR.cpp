@@ -202,7 +202,7 @@ static VALUE resource_find(int argc, VALUE *argv, VALUE self)
  * QAR
  */
 
-VALUE qar_extended(VALUE self, VALUE base)
+static VALUE qar_extended(VALUE self, VALUE base)
 {
     return Qnil;
 }
