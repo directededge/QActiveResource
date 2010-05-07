@@ -35,7 +35,8 @@ extern "C"
         {
         case QVariant::Hash:
         {
-            VALUE value = rb_hash_new();
+            static const ID new_symbol = rb_intern("new");
+            VALUE value = rb_funcall(rb_cQARHash, new_symbol, 0);
 
             QHash<QString, QVariant> hash = v.toHash();
 
