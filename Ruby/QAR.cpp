@@ -3,6 +3,7 @@
  */
 
 #include <QActiveResource.h>
+#include <QDateTime>
 #include <ruby.h>
 
 extern "C"
@@ -84,6 +85,11 @@ extern "C"
             return rb_int_new(v.toInt());
         case QVariant::Double:
             return rb_float_new(v.toDouble());
+        case QVariant::DateTime:
+        {
+            static const ID at = rb_intern("at");
+            return rb_funcall(rb_cTime, at, 1, rb_int_new(v.toDateTime().toTime_t()));
+        }
         default:
             return rb_str_new2(v.toString().toUtf8());
         }
