@@ -9,7 +9,7 @@
 extern "C"
 {
     typedef VALUE(*ARGS)(...);
-    typedef int (*ITERATOR)(...);
+    typedef int(*ITERATOR)(...);
 
     static VALUE rb_mQAR;
     static VALUE rb_cQARParamList;

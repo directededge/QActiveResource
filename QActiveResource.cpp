@@ -19,7 +19,13 @@ static size_t writer(void *ptr, size_t size, size_t nmemb, void *stream)
 
 namespace HTTP
 {
-    QByteArray get(const QUrl &url)
+    enum Redirect
+    {
+        FollowRedirects,
+        DoNotFollowRedirects
+    };
+
+    QByteArray get(const QUrl &url, Redirect redirect = DoNotFollowRedirects)
     {
         QByteArray data;
         CURL *curl = curl_easy_init();
@@ -36,6 +42,13 @@ namespace HTTP
                 curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) &data);
                 curl_easy_setopt(curl, CURLOPT_TIMEOUT, 25);
                 curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+
+                if(redirect == FollowRedirects)
+                {
+                    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+                    curl_easy_setopt(curl, CURLOPT_UNRESTRICTED_AUTH, 1);
+                    curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 2);
+                }
             }
             while(curl_easy_perform(curl) != 0 && ++retry <= maxRetry);
             curl_easy_cleanup(curl);
@@ -162,7 +175,7 @@ static RecordList fetch(QUrl url)
         url.setPath(url.path() + ".xml");
     }
 
-    QByteArray data = HTTP::get(url);
+    QByteArray data = HTTP::get(url, HTTP::FollowRedirects);
 
     QXmlStreamReader xml(data);
 
