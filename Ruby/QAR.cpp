@@ -208,6 +208,15 @@ extern "C"
         return array;
     }
 
+    /*
+     * QAR
+     */
+
+    VALUE qar_extended(VALUE self, VALUE base)
+    {
+        return Qnil;
+    }
+
     void Init_QAR(void)
     {
         rb_mQAR = rb_define_module("QAR");
@@ -222,5 +231,7 @@ extern "C"
         rb_define_alloc_func(rb_cQARResource, resource_allocate);
         rb_define_method(rb_cQARResource, "initialize", (ARGS) resource_initialize, 2);
         rb_define_method(rb_cQARResource, "find", (ARGS) resource_find, -1);
+
+        rb_define_singleton_method(rb_mQAR, "extended", (ARGS) qar_extended, 1);
     }
 }
