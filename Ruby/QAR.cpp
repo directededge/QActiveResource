@@ -6,7 +6,6 @@
 #include <QActiveResource.h>
 #include <QDateTime>
 #include <ruby.h>
-#include <QDebug>
 
 typedef VALUE(*ARGS)(...);
 typedef int(*ITERATOR)(...);
@@ -16,23 +15,28 @@ static VALUE rb_cQARHash;
 static VALUE rb_cQARParamList;
 static VALUE rb_cQARResource;
 
-namespace Symbol
-{
-    const ID all = rb_intern("all");
-    const ID at = rb_intern("at");
-    const ID first = rb_intern("first");
-    const ID follow_redirects = rb_intern("follow_redirects");
-    const ID method_missing = rb_intern("method_missing");
-    const ID New = rb_intern("new");
-    const ID one = rb_intern("one");
-    const ID params = rb_intern("params");
-    const ID to_s = rb_intern("to_s");
-    const ID last = rb_intern("last");
-}
+/*
+ * Symbols
+ */
+
+static const ID _all = rb_intern("all");
+static const ID _at = rb_intern("at");
+static const ID _collection_name = rb_intern("collection_name");
+static const ID _element_name = rb_intern("element_name");
+static const ID _first = rb_intern("first");
+static const ID _follow_redirects = rb_intern("follow_redirects");
+static const ID _method_missing = rb_intern("method_missing");
+static const ID _new = rb_intern("new");
+static const ID _one = rb_intern("one");
+static const ID _params = rb_intern("params");
+static const ID _qar_resource = rb_intern("qar_resource");
+static const ID _site = rb_intern("site");
+static const ID _to_s = rb_intern("to_s");
+static const ID _last = rb_intern("last");
 
 static QString to_s(VALUE value)
 {
-    VALUE s = rb_funcall(value, Symbol::to_s, 0);
+    VALUE s = rb_funcall(value, _to_s, 0);
     return QString::fromUtf8(StringValuePtr(s));
 }
 
@@ -42,7 +46,7 @@ static VALUE to_value(const QVariant &v)
     {
     case QVariant::Hash:
     {
-        VALUE value = rb_funcall(rb_cQARHash, Symbol::New, 0);
+        VALUE value = rb_funcall(rb_cQARHash, _new, 0);
         QHash<QString, QVariant> hash = v.toHash();
 
         for(QHash<QString, QVariant>::ConstIterator it = hash.begin(); it != hash.end(); ++it)
@@ -73,7 +77,7 @@ static VALUE to_value(const QVariant &v)
         return rb_float_new(v.toDouble());
     case QVariant::DateTime:
     {
-        return rb_funcall(rb_cTime, Symbol::at, 1, rb_int_new(v.toDateTime().toTime_t()));
+        return rb_funcall(rb_cTime, _at, 1, rb_int_new(v.toDateTime().toTime_t()));
     }
     default:
         return rb_str_new2(v.toString().toUtf8());
@@ -88,7 +92,7 @@ static VALUE hash_method_missing(VALUE self, VALUE method)
 {
     VALUE value = rb_hash_aref(self, method);
     return (value == Qnil) ?
-        rb_funcall(rb_cHash, ID2SYM(Symbol::method_missing), 1, method) : value;
+        rb_funcall(rb_cHash, ID2SYM(_method_missing), 1, method) : value;
 }
 
 /*
@@ -105,14 +109,6 @@ static VALUE resource_allocate(VALUE klass)
 {
     QActiveResource::Resource *resource = new QActiveResource::Resource;
     return Data_Wrap_Struct(klass, resource_mark, resource_free, resource);
-}
-
-static VALUE resource_initialize(VALUE self, VALUE base, VALUE resource)
-{
-    QActiveResource::Resource *r = 0;
-    Data_Get_Struct(self, QActiveResource::Resource, r);
-    r->setBase(QString::fromUtf8(rb_string_value_ptr(&base)));
-    r->setResource(QString::fromUtf8(rb_string_value_ptr(&resource)));
 }
 
 /*
@@ -138,23 +134,39 @@ static int params_hash_iterator(VALUE key, VALUE value, VALUE params)
     params_pointer->append(QActiveResource::Param(to_s(key), to_s(value)));
 }
 
-static VALUE resource_find(int argc, VALUE *argv, VALUE self)
+/*
+ * QAR
+ */
+
+static VALUE qar_find(int argc, VALUE *argv, VALUE self)
 {
+    VALUE member = rb_ivar_get(self, _qar_resource);
     QActiveResource::Resource *resource = 0;
-    Data_Get_Struct(self, class QActiveResource::Resource, resource);
+
+    if(member == Qnil)
+    {
+        member = rb_funcall(rb_cQARResource, _new, 0);
+        rb_ivar_set(self, _qar_resource, member);
+        Data_Get_Struct(member, QActiveResource::Resource, resource);
+        resource->setBase(to_s(rb_funcall(self, _site, 0)));
+    }
+    else
+    {
+        Data_Get_Struct(member, QActiveResource::Resource, resource);
+    }
 
     VALUE params = param_list_allocate(rb_cData);
 
     if(argc >= 2 && TYPE(argv[1]) == T_HASH)
     {
-        VALUE params_hash = rb_hash_aref(argv[1], ID2SYM(Symbol::params));
+        VALUE params_hash = rb_hash_aref(argv[1], ID2SYM(_params));
 
         if(params_hash != Qnil)
         {
             rb_hash_foreach(params_hash, (ITERATOR) params_hash_iterator, params);
         }
 
-        VALUE follow_redirects = rb_hash_aref(argv[1], ID2SYM(Symbol::follow_redirects));
+        VALUE follow_redirects = rb_hash_aref(argv[1], ID2SYM(_follow_redirects));
         resource->setFollowRedirects(follow_redirects == Qtrue);
     }
 
@@ -166,21 +178,23 @@ static VALUE resource_find(int argc, VALUE *argv, VALUE self)
     if(argc >= 1)
     {
         ID current = SYM2ID(argv[0]);
+        resource->setResource(to_s(rb_funcall(self, _collection_name, 0)));
 
-        if(current == Symbol::one)
+        if(current == _one)
         {
             return to_value(resource->find(QActiveResource::FindOne, from, *params_pointer));
         }
-        else if(current == Symbol::first)
+        else if(current == _first)
         {
             return to_value(resource->find(QActiveResource::FindFirst, from, *params_pointer));
         }
-        else if(current == Symbol::last)
+        else if(current == _last)
         {
             return to_value(resource->find(QActiveResource::FindLast, from, *params_pointer));
         }
-        else if(current != Symbol::all)
+        else if(current != _all)
         {
+            resource->setResource(to_s(rb_funcall(self, _element_name, 0)));
             return to_value(resource->find(to_s(argv[0])));
         }
     }
@@ -198,15 +212,6 @@ static VALUE resource_find(int argc, VALUE *argv, VALUE self)
     return array;
 }
 
-/*
- * QAR
- */
-
-static VALUE qar_extended(VALUE self, VALUE base)
-{
-    return Qnil;
-}
-
 extern "C"
 {
     void Init_QAR(void)
@@ -221,9 +226,7 @@ extern "C"
 
         rb_cQARResource = rb_define_class_under(rb_mQAR, "Resource", rb_cObject);
         rb_define_alloc_func(rb_cQARResource, resource_allocate);
-        rb_define_method(rb_cQARResource, "initialize", (ARGS) resource_initialize, 2);
-        rb_define_method(rb_cQARResource, "find", (ARGS) resource_find, -1);
 
-        rb_define_singleton_method(rb_mQAR, "extended", (ARGS) qar_extended, 1);
+        rb_define_method(rb_mQAR, "find", (ARGS) qar_find, -1);
     }
 }
