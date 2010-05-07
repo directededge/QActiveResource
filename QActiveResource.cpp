@@ -65,6 +65,18 @@ static void assign(Record *record, QString name, const QVariant &value)
     (*record)[name.replace('-', '_')] = value;
 }
 
+static QDateTime toDateTime(const QString &s)
+{
+    QDateTime time = QDateTime::fromString(s.left(s.length() - 6), Qt::ISODate);
+
+    time.setTimeSpec(Qt::UTC);
+
+    int zoneHours = s.mid(s.length() - 6, 3).toInt();
+    int zoneMinutes = s.right(2).toInt();
+
+    return time.addSecs(-1 * (60 * zoneHours + zoneMinutes) * 60);
+}
+
 static QVariant reader(QXmlStreamReader &xml, bool advance = true)
 {
     Record record;
@@ -119,7 +131,7 @@ static QVariant reader(QXmlStreamReader &xml, bool advance = true)
                     value = text.toDouble();
                     break;
                 case QVariant::DateTime:
-                    value = QDateTime::fromString(text, Qt::ISODate);
+                    value = toDateTime(text);
                     break;
                 case QVariant::Bool:
                     value = bool(text == "true");
