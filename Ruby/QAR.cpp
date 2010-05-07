@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2010, Directed Edge, Inc. | Licensed under the MPL and LGPL
  */
@@ -15,8 +16,11 @@ extern "C"
     static VALUE rb_cQARParamList;
     static VALUE rb_cQARResource;
 
-    static void resource_mark(QActiveResource::Resource *resource) {}
+    /*
+     * Resource
+     */
 
+    static void resource_mark(QActiveResource::Resource *) {}
     static void resource_free(QActiveResource::Resource *resource)
     {
         delete resource;
@@ -31,21 +35,24 @@ extern "C"
     static VALUE resource_initialize(VALUE self, VALUE base, VALUE resource)
     {
         QActiveResource::Resource *r = 0;
-        Data_Get_Struct(self, class QActiveResource::Resource, r);
+        Data_Get_Struct(self, QActiveResource::Resource, r);
         r->setBase(QString::fromUtf8(rb_string_value_ptr(&base)));
         r->setResource(QString::fromUtf8(rb_string_value_ptr(&resource)));
     }
 
-    static VALUE param_list_mark(QList<QActiveResource::Param> *) {}
+    /*
+     * ParamList
+     */
 
-    static VALUE param_list_free(QList<QActiveResource::Param> *params)
+    static VALUE param_list_mark(QActiveResource::ParamList *) {}
+    static VALUE param_list_free(QActiveResource::ParamList *params)
     {
         delete params;
     }
 
     static VALUE param_list_allocate(VALUE klass)
     {
-        QList<QActiveResource::Param> *params = new QList<QActiveResource::Param>();
+        QActiveResource::ParamList *params = new QActiveResource::ParamList();
         return Data_Wrap_Struct(klass, param_list_mark, param_list_free, params);
     }
 
@@ -104,8 +111,8 @@ extern "C"
 
     static int hash_iterator(VALUE key, VALUE value, VALUE params)
     {
-        QList<QActiveResource::Param> *params_pointer;
-        Data_Get_Struct(params, class QList<QActiveResource::Param>, params_pointer);
+        QActiveResource::ParamList *params_pointer;
+        Data_Get_Struct(params, QActiveResource::ParamList, params_pointer);
         params_pointer->append(QActiveResource::Param(to_s(key), to_s(value)));
     }
 
@@ -131,8 +138,8 @@ extern "C"
             resource->setFollowRedirects(follow_redirects == Qtrue);
         }
 
-        QList<QActiveResource::Param> *params_pointer;
-        Data_Get_Struct(params, class QList<QActiveResource::Param>, params_pointer);
+        QActiveResource::ParamList *params_pointer;
+        Data_Get_Struct(params, QActiveResource::ParamList, params_pointer);
 
         QString from;
 

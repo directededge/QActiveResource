@@ -38,6 +38,8 @@ namespace QActiveResource
         QSharedDataPointer<Data> d;
     };
 
+    typedef QList<Param> ParamList;
+
     /*!
      * Used with Resource::find() to specify that only one record should be
      * returned.
@@ -100,14 +102,14 @@ namespace QActiveResource
          * should be used that is below the base / resource and \a params is a list
          * of parameters that should be appended to the query string.
          */
-        Record find(FindSingle style, const QString &from, const QList<Param> &params) const;
+        Record find(FindSingle style, const QString &from, const ParamList &params) const;
 
         /*!
          * Finds a record using \a style.  \a from specifies a specific resource that
          * should be used that is below the base / resource and \a params is a list
          * of parameters that should be appended to the query string.
          */
-        RecordList find(FindMulti style, const QString &from, const QList<Param> &params) const;
+        RecordList find(FindMulti style, const QString &from, const ParamList &params) const;
 
         /*!
          * Convenience overload of the above that lets the parameters be specified

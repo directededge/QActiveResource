@@ -286,7 +286,7 @@ Record Resource::find(const QVariant &id) const
     return find(FindOne, id.toString());
 }
 
-RecordList Resource::find(FindMulti style, const QString &from, const QList<Param> &params) const
+RecordList Resource::find(FindMulti style, const QString &from, const ParamList &params) const
 {
     Q_UNUSED(style);
 
@@ -308,7 +308,7 @@ RecordList Resource::find(FindMulti style, const QString &from, const QList<Para
     return fetch(url, d->followRedirects);
 }
 
-Record Resource::find(FindSingle style, const QString &from, const QList<Param> &params) const
+Record Resource::find(FindSingle style, const QString &from, const ParamList &params) const
 {
     QUrl url = d->url;
 
@@ -347,14 +347,14 @@ Record Resource::find(FindSingle style, const QString &from,
                       const Param &first, const Param &second,
                       const Param &third, const Param &fourth) const
 {
-    return find(style, from, QList<Param>() << first << second << third << fourth);
+    return find(style, from, ParamList() << first << second << third << fourth);
 }
 
 RecordList Resource::find(FindMulti style, const QString &from,
                           const Param &first, const Param &second,
                           const Param &third, const Param &fourth) const
 {
-    return find(style, from, QList<Param>() << first << second << third << fourth);
+    return find(style, from, ParamList() << first << second << third << fourth);
 }
 
 void Resource::setFollowRedirects(bool followRedirects)
