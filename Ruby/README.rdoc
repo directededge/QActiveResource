@@ -1,34 +1,27 @@
 == QAR - QActiveResource for Ruby
 
-This is an ActiveResource-like clone implemented in C++ / Qt which is much faster
-for reading ActiveResource data.  Currently it only supports reading and a limited
-set of operations, notably find.
+This is a drop in much faster replacement for ActiveResource's find with much
+of the same functionality, and vastly improved performance.
 
-The resource is not created by subclassing as with ActiveResource, but by passing
-in fields to the QAR::Resource constructor:
+You can switch on QAR for a specific resource by extending that resource with
+QAR:
 
-  resource = QAR::Resource.new("http://somesite.com", "items")
+  require 'rubygems'
+  require 'active_resource'
+  require 'QAR'
 
-Then find is supported on the resource:
+  class Product < ActiveResource::Base
+    extend QAR
+    self.site = 'http://localhost/'
+  end
 
-  value = resource.find(123)
-  value = resource.find(:first)
-  value = resource.find(:last)
-  value = resource.find(:one)
-  values = resource.find(:all)
+And then use find as you normally would.  There are a few subtle differences:
 
-Without a parameter, it simply returns all resources:
+- QAR uses a hash (with a specialization to allow for access by method) rather
+  than special objects.
 
-  values = resource.find
+- QAR also provides a :follow_redirects => true option for following redirects
+  automatically (an annoying missing feature in the usual find.
 
-Parameters are also supported, notably:
-
-  values = resource.find(:all, :params => { :page => 1 })
-
-And so on.
-
-At present accessor methods are not returned, the result is simply a hash, so
-values are accessed by symbol:
-
-  puts value[:title]
-  
+- QAR may not support all features of ActiveResource's find, please report
+  bugs or fork and extend
