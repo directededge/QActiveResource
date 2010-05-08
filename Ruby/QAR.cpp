@@ -174,14 +174,15 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
     Data_Get_Struct(params, QActiveResource::ParamList, params_pointer);
 
     QString from;
+    resource->setResource(to_s(rb_funcall(self, _collection_name, 0)));
 
     if(argc >= 1)
     {
         ID current = SYM2ID(argv[0]);
-        resource->setResource(to_s(rb_funcall(self, _collection_name, 0)));
 
         if(current == _one)
         {
+            resource->setResource(to_s(rb_funcall(self, _element_name, 0)));
             return to_value(resource->find(QActiveResource::FindOne, from, *params_pointer));
         }
         else if(current == _first)
