@@ -11,7 +11,6 @@ typedef VALUE(*ARGS)(...);
 typedef int(*ITERATOR)(...);
 
 static VALUE rb_mQAR;
-static VALUE rb_cQARHash;
 static VALUE rb_cQARParamList;
 static VALUE rb_cQARResource;
 
@@ -53,7 +52,7 @@ static VALUE to_value(const QVariant &v)
     {
     case QVariant::Hash:
     {
-        VALUE value = rb_funcall(rb_cQARHash, _new, 0);
+        VALUE value = rb_hash_new();
         QHash<QString, QVariant> hash = v.toHash();
 
         for(QHash<QString, QVariant>::ConstIterator it = hash.begin(); it != hash.end(); ++it)
@@ -222,8 +221,6 @@ extern "C"
     void Init_QAR(void)
     {
         rb_mQAR = rb_define_module("QAR");
-
-        rb_cQARHash = rb_define_class_under(rb_mQAR, "Hash", rb_cHash);
 
         rb_cQARParamList = rb_define_class_under(rb_mQAR, "ParamList", rb_cObject);
         rb_define_alloc_func(rb_cQARParamList, param_list_allocate);
