@@ -20,6 +20,7 @@ static VALUE rb_cQARResource;
  */
 
 static const ID _all = rb_intern("all");
+static const ID _allocate = rb_intern("allocate");
 static const ID _at = rb_intern("at");
 static const ID _collection_name = rb_intern("collection_name");
 static const ID _element_name = rb_intern("element_name");
@@ -28,10 +29,17 @@ static const ID _follow_redirects = rb_intern("follow_redirects");
 static const ID _new = rb_intern("new");
 static const ID _one = rb_intern("one");
 static const ID _params = rb_intern("params");
-static const ID _qar_resource = rb_intern("qar_resource");
 static const ID _site = rb_intern("site");
 static const ID _to_s = rb_intern("to_s");
 static const ID _last = rb_intern("last");
+
+/*
+ * Instance variable symbols
+ */
+
+static const ID __attributes = rb_intern("@attributes");
+static const ID __prefix_options = rb_intern("@prefix_options");
+static const ID __qar_resource = rb_intern("@qar_resource");
 
 static QString to_s(VALUE value)
 {
@@ -50,7 +58,7 @@ static VALUE to_value(const QVariant &v)
 
         for(QHash<QString, QVariant>::ConstIterator it = hash.begin(); it != hash.end(); ++it)
         {
-            rb_hash_aset(value, ID2SYM(rb_intern(it.key().toUtf8())), to_value(it.value()));
+            rb_hash_aset(value, rb_str_new2(it.key().toUtf8()), to_value(it.value()));
         }
 
         return value;
@@ -85,7 +93,10 @@ static VALUE to_value(const QVariant &v)
 
 static VALUE to_record(VALUE klass, const QVariant &v)
 {
-    return rb_funcall(klass, _new, 1, to_value(v));
+    VALUE record = rb_funcall(klass, _allocate, 0);
+    rb_ivar_set(record, __attributes, to_value(v));
+    rb_ivar_set(record, __prefix_options, rb_hash_new());
+    return record;
 }
 
 /*
@@ -133,13 +144,13 @@ static int params_hash_iterator(VALUE key, VALUE value, VALUE params)
 
 static VALUE qar_find(int argc, VALUE *argv, VALUE self)
 {
-    VALUE member = rb_ivar_get(self, _qar_resource);
+    VALUE member = rb_ivar_get(self, __qar_resource);
     QActiveResource::Resource *resource = 0;
 
     if(member == Qnil)
     {
         member = rb_funcall(rb_cQARResource, _new, 0);
-        rb_ivar_set(self, _qar_resource, member);
+        rb_ivar_set(self, __qar_resource, member);
         Data_Get_Struct(member, QActiveResource::Resource, resource);
         resource->setBase(to_s(rb_funcall(self, _site, 0)));
     }
