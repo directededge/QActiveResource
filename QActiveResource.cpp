@@ -190,7 +190,7 @@ static RecordList fetch(QUrl url, bool followRedirects = false)
             records.append(v.toHash());
         }
     }
-    else
+    else if(value.isValid())
     {
         records.append(value.toHash());
     }
