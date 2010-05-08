@@ -25,7 +25,6 @@ static const ID _collection_name = rb_intern("collection_name");
 static const ID _element_name = rb_intern("element_name");
 static const ID _first = rb_intern("first");
 static const ID _follow_redirects = rb_intern("follow_redirects");
-static const ID _method_missing = rb_intern("method_missing");
 static const ID _new = rb_intern("new");
 static const ID _one = rb_intern("one");
 static const ID _params = rb_intern("params");
@@ -84,15 +83,9 @@ static VALUE to_value(const QVariant &v)
     }
 }
 
-/*
- * Hash
- */
-
-static VALUE hash_method_missing(VALUE self, VALUE method)
+static VALUE to_record(VALUE klass, const QVariant &v)
 {
-    VALUE value = rb_hash_aref(self, method);
-    return (value == Qnil) ?
-        rb_funcall(rb_cHash, ID2SYM(_method_missing), 1, method) : value;
+    return rb_funcall(klass, _new, 1, to_value(v));
 }
 
 /*
@@ -183,20 +176,20 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
         if(current == _one)
         {
             resource->setResource(to_s(rb_funcall(self, _element_name, 0)));
-            return to_value(resource->find(QActiveResource::FindOne, from, *params_pointer));
+            return to_record(self, resource->find(QActiveResource::FindOne, from, *params_pointer));
         }
         else if(current == _first)
         {
-            return to_value(resource->find(QActiveResource::FindFirst, from, *params_pointer));
+            return to_record(self, resource->find(QActiveResource::FindFirst, from, *params_pointer));
         }
         else if(current == _last)
         {
-            return to_value(resource->find(QActiveResource::FindLast, from, *params_pointer));
+            return to_record(self, resource->find(QActiveResource::FindLast, from, *params_pointer));
         }
         else if(current != _all)
         {
             resource->setResource(to_s(rb_funcall(self, _element_name, 0)));
-            return to_value(resource->find(to_s(argv[0])));
+            return to_record(self, resource->find(to_s(argv[0])));
         }
     }
 
@@ -207,7 +200,7 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
 
     for(int i = 0; i < records.length(); i++)
     {
-        rb_ary_store(array, i, to_value(records[i]));
+        rb_ary_store(array, i, to_record(self, records[i]));
     }
 
     return array;
@@ -220,7 +213,6 @@ extern "C"
         rb_mQAR = rb_define_module("QAR");
 
         rb_cQARHash = rb_define_class_under(rb_mQAR, "Hash", rb_cHash);
-        rb_define_method(rb_cQARHash, "method_missing", (ARGS) hash_method_missing, 1);
 
         rb_cQARParamList = rb_define_class_under(rb_mQAR, "ParamList", rb_cObject);
         rb_define_alloc_func(rb_cQARParamList, param_list_allocate);
