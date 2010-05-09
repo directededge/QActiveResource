@@ -165,7 +165,7 @@ static QVariant reader(QXmlStreamReader &xml, bool advance = true)
                     value = bool(text == "true");
                     break;
                 default:
-                    value = text;
+                    value = text.isEmpty() ? QVariant() : text;
                 }
 
                 assign(&record, xml.name().toString(), value);
