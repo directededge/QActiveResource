@@ -1,57 +1,71 @@
-================
+========================
+Ruby / Dummy (load time)
+
+real	0m0.496s
+user	0m0.396s
+sys	0m0.089s
+
+real	0m0.484s
+user	0m0.391s
+sys	0m0.088s
+
+real	0m0.482s
+user	0m0.390s
+sys	0m0.088s
+========================
 Ruby / REXML
 
-real	0m32.334s
-user	0m30.403s
-sys	0m1.589s
+real	0m32.156s
+user	0m30.114s
+sys	0m1.518s
 
-real	0m34.025s
-user	0m32.010s
-sys	0m1.659s
+real	0m34.290s
+user	0m32.440s
+sys	0m1.608s
 
-real	0m37.444s
-user	0m35.223s
-sys	0m1.817s
-================
+real	0m37.662s
+user	0m35.432s
+sys	0m1.775s
+========================
 Ruby / Nokogiri
 
-real	0m12.970s
-user	0m12.092s
-sys	0m0.688s
-
-real	0m12.967s
-user	0m12.055s
-sys	0m0.657s
-
-real	0m12.674s
-user	0m11.878s
+real	0m12.839s
+user	0m12.007s
 sys	0m0.648s
-================
+
+real	0m12.642s
+user	0m11.879s
+sys	0m0.638s
+
+real	0m12.333s
+user	0m11.661s
+sys	0m0.615s
+========================
 C++ / QAR
 
-real	0m0.802s
-user	0m0.659s
-sys	0m0.078s
+real	0m0.908s
+user	0m0.788s
+sys	0m0.072s
 
-real	0m0.793s
-user	0m0.662s
-sys	0m0.077s
+real	0m0.904s
+user	0m0.787s
+sys	0m0.070s
 
-real	0m0.782s
-user	0m0.652s
-sys	0m0.077s
-================
+real	0m0.890s
+user	0m0.775s
+sys	0m0.069s
+========================
 Ruby / QAR
 
-real	0m1.055s
-user	0m0.918s
-sys	0m0.085s
+real	0m1.746s
+user	0m1.516s
+sys	0m0.179s
 
-real	0m1.058s
-user	0m0.919s
-sys	0m0.085s
+real	0m1.733s
+user	0m1.508s
+sys	0m0.175s
 
-real	0m1.057s
-user	0m0.916s
-sys	0m0.086s
-================
+real	0m1.760s
+user	0m1.527s
+sys	0m0.177s
+========================
