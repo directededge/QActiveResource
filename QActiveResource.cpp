@@ -86,11 +86,18 @@ static QDateTime toDateTime(const QString &s)
 
 static QString toClassName(QString name)
 {
-    QRegExp re("(^|-)([a-z])");
+    if(name.isEmpty())
+    {
+        return name;
+    }
+
+    name[0] = name[0].toUpper();
+
+    QRegExp re("-([a-z])");
 
     while(name.indexOf(re) >= 0)
     {
-        name.replace(re.cap(0), re.cap(2).toUpper());
+        name.replace(re.cap(0), re.cap(1).toUpper());
     }
 
     return name;
