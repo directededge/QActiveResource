@@ -105,7 +105,21 @@ static QString toClassName(QString name)
     return name;
 }
 
-static QVariant reader(QXmlStreamReader &xml, bool advance = true)
+static QVariant extractFromRecord(const QVariant &record)
+{
+    QVariantHash hash = record.toHash();
+    QStringList keys = hash.keys();
+    keys.removeOne(QActiveResourceClassKey);
+    return hash[keys.front()];
+}
+
+static bool hasNext(const QXmlStreamReader &xml)
+{
+    return (xml.tokenType() == QXmlStreamReader::StartElement ||
+            (xml.tokenType() == QXmlStreamReader::Characters && xml.isWhitespace()));
+}
+
+static QVariant reader(QXmlStreamReader &xml, bool advance, bool isHash)
 {
     Record record;
     QString elementName;
@@ -128,14 +142,13 @@ static QVariant reader(QXmlStreamReader &xml, bool advance = true)
             if(type == "array")
             {
                 QString name = xml.name().toString();
-                QList<QVariant> array;
+                QVariantList array;
 
-                while(xml.readNext() == QXmlStreamReader::StartElement ||
-                      (xml.tokenType() == QXmlStreamReader::Characters && xml.isWhitespace()))
+                while(xml.readNext() && hasNext(xml))
                 {
                     if(!xml.isWhitespace())
                     {
-                        array.append(reader(xml, false));
+                        array.append(reader(xml, false, false));
                     }
                 }
 
@@ -145,30 +158,54 @@ static QVariant reader(QXmlStreamReader &xml, bool advance = true)
             {
                 assign(&record, xml.name().toString(), QVariant());
             }
-            else if(advance && xml.name() != elementName)
+            else if((advance && xml.name() != elementName) || isHash)
             {
-                QVariant value;
-                QString text = xml.readElementText();
+                QString name = xml.name().toString();
 
-                switch(lookupType(type))
+                while(xml.readNext() && xml.isWhitespace()) {}
+
+                if(xml.tokenType() == QXmlStreamReader::StartElement)
                 {
-                case QVariant::Int:
-                    value = text.toInt();
-                    break;
-                case QVariant::Double:
-                    value = text.toDouble();
-                    break;
-                case QVariant::DateTime:
-                    value = toDateTime(text);
-                    break;
-                case QVariant::Bool:
-                    value = bool(text == "true");
-                    break;
-                default:
-                    value = text.isEmpty() ? QVariant() : text;
-                }
+                    Record sub;
+                    sub.setClassName(toClassName(name));
 
-                assign(&record, xml.name().toString(), value);
+                    while(hasNext(xml))
+                    {
+                        if(!xml.isWhitespace())
+                        {
+                            QString subName = xml.name().toString();
+                            assign(&sub, subName, extractFromRecord(reader(xml, false, true)));
+                        }
+                        xml.readNext();
+                    }
+
+                    assign(&record, name, sub);
+                }
+                else
+                {
+                    QVariant value;
+                    QString text = xml.text().toString();
+
+                    switch(lookupType(type))
+                    {
+                    case QVariant::Int:
+                        value = text.toInt();
+                        break;
+                    case QVariant::Double:
+                        value = text.toDouble();
+                        break;
+                    case QVariant::DateTime:
+                        value = toDateTime(text);
+                        break;
+                    case QVariant::Bool:
+                        value = bool(text == "true");
+                        break;
+                    default:
+                        value = text.isEmpty() ? QVariant() : text;
+                    }
+
+                    assign(&record, name, value);
+                }
             }
         }
         if(xml.tokenType() == QXmlStreamReader::EndElement &&
@@ -195,7 +232,7 @@ static RecordList fetch(QUrl url, bool followRedirects = false)
 
     QXmlStreamReader xml(data);
 
-    QVariant value = reader(xml);
+    QVariant value = reader(xml, true, false);
     RecordList records;
 
     if(value.type() == QVariant::List)
@@ -207,11 +244,7 @@ static RecordList fetch(QUrl url, bool followRedirects = false)
     }
     else if(value.type() == QVariant::Hash && value.toHash().size() == 2)
     {
-        QVariantHash hash = value.toHash();
-        QStringList keys = hash.keys();
-        keys.removeOne(QActiveResourceClassKey);
-
-        foreach(QVariant v, hash[keys.front()].toList())
+        foreach(QVariant v, extractFromRecord(value).toList())
         {
             records.append(v.toHash());
         }
