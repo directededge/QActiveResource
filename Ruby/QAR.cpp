@@ -58,7 +58,7 @@ static QString to_s(VALUE value)
     return QString::fromUtf8(StringValuePtr(s));
 }
 
-static VALUE to_value(const QVariant &v, VALUE = 0)
+static VALUE to_value(const QVariant &v, VALUE base, bool isChild = false)
 {
     switch(v.type())
     {
@@ -76,13 +76,21 @@ static VALUE to_value(const QVariant &v, VALUE = 0)
         Q_ASSERT(hash.contains(QACTIVERESOURCE_CLASS_KEY));
 
         QString className = hash[QACTIVERESOURCE_CLASS_KEY].toString();
-        VALUE klass = rb_define_class(className.toUtf8(), rb_cActiveResourceBase);
+
+        VALUE klass = base;
+
+        if(isChild)
+        {
+            klass = rb_define_class_under(base, className.toUtf8(), rb_cActiveResourceBase);
+        }
 
         for(QHash<QString, QVariant>::ConstIterator it = hash.begin(); it != hash.end(); ++it)
         {
             if(it.key() != QACTIVERESOURCE_CLASS_KEY)
             {
-                rb_hash_aset(attributes, rb_str_new2(it.key().toUtf8()), to_value(it.value()));
+                VALUE key = rb_str_new2(it.key().toUtf8());
+                VALUE value = to_value(it.value(), base, true);
+                rb_hash_aset(attributes, key, value);
             }
         }
 
@@ -97,7 +105,7 @@ static VALUE to_value(const QVariant &v, VALUE = 0)
 
         foreach(QVariant element, v.toList())
         {
-            rb_ary_push(value, to_value(element));
+            rb_ary_push(value, to_value(element, base, isChild));
         }
 
         return value;
