@@ -511,7 +511,17 @@ RecordList Resource::find(FindMulti style, const QString &from, const ParamList 
 {
     Q_UNUSED(style);
 
-    QUrl url = d->url;
+    QUrl url;
+
+    if(from.isEmpty())
+    {
+        url = d->url;
+    }
+    else
+    {
+        url = d->base;
+        url.setPath(from);
+    }
 
     foreach(Param param, params)
     {
@@ -519,11 +529,6 @@ RecordList Resource::find(FindMulti style, const QString &from, const ParamList 
         {
             url.addQueryItem(param.key(), param.value());
         }
-    }
-
-    if(!from.isEmpty())
-    {
-        url.setPath(url.path() + "/" + from);
     }
 
     return fetch(url, d->followRedirects);
@@ -532,19 +537,6 @@ RecordList Resource::find(FindMulti style, const QString &from, const ParamList 
 Record Resource::find(FindSingle style, const QString &from, const ParamList &params) const
 {
     QUrl url = d->url;
-
-    foreach(Param param, params)
-    {
-        if(!param.isNull())
-        {
-            url.addQueryItem(param.key(), param.value());
-        }
-    }
-
-    if(!from.isEmpty())
-    {
-        url.setPath(url.path() + "/" + from);
-    }
 
     switch(style)
     {

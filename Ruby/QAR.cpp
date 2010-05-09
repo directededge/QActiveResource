@@ -36,6 +36,7 @@ static const ID _at = rb_intern("at");
 static const ID _collection_name = rb_intern("collection_name");
 static const ID _element_name = rb_intern("element_name");
 static const ID _first = rb_intern("first");
+static const ID _from = rb_intern("from");
 static const ID _new = rb_intern("new");
 static const ID _one = rb_intern("one");
 static const ID _params = rb_intern("params");
@@ -188,6 +189,8 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
 {
     QActiveResource::Resource *resource = get_resource(self);
 
+    QString from;
+
     VALUE params = param_list_allocate(rb_cData);
 
     if(argc >= 2 && TYPE(argv[1]) == T_HASH)
@@ -198,12 +201,13 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
         {
             rb_hash_foreach(params_hash, (ITERATOR) params_hash_iterator, params);
         }
+
+        from = to_s(rb_hash_aref(argv[1], ID2SYM(_from)));
     }
 
     QActiveResource::ParamList *params_pointer;
     Data_Get_Struct(params, QActiveResource::ParamList, params_pointer);
 
-    QString from;
     resource->setResource(to_s(rb_funcall(self, _collection_name, 0)));
 
     try
