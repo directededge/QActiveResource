@@ -339,7 +339,7 @@ Resource::Data::Data(const QUrl &b, const QString &r) :
 void Resource::Data::setUrl()
 {
     url = base;
-    url.setPath(base.path() + "/" + resource);
+    url.setPath(base.path() + (base.path().endsWith("/") ? "" : "/") + resource);
 }
 
 /*
