@@ -3,6 +3,8 @@
 
 int main()
 {
+    Q_ASSERT(getenv("AR_BASE") && getenv("AR_RESOURCE") && getenv("AR_FIELD"));
+
     qDebug() << getenv("AR_BASE");
     QActiveResource::Resource resource(QUrl(getenv("AR_BASE")), getenv("AR_RESOURCE"));
 
