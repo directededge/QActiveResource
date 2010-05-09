@@ -11,6 +11,8 @@
 
 using namespace QActiveResource;
 
+static const QString QActiveResourceClassKey = "QActiveResource Class";
+
 static size_t writer(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     reinterpret_cast<QByteArray *>(stream)->append(QByteArray((const char *)(ptr), size * nmemb));
@@ -205,7 +207,11 @@ static RecordList fetch(QUrl url, bool followRedirects = false)
     }
     else if(value.type() == QVariant::Hash && value.toHash().size() == 2)
     {
-        foreach(QVariant v, value.toHash().begin()->toList())
+        QVariantHash hash = value.toHash();
+        QStringList keys = hash.keys();
+        keys.removeOne(QActiveResourceClassKey);
+
+        foreach(QVariant v, hash[keys.front()].toList())
         {
             records.append(v.toHash());
         }
@@ -221,8 +227,6 @@ static RecordList fetch(QUrl url, bool followRedirects = false)
 /*
  * Record
  */
-
-static const QString QActiveResourceClassKey = "QActiveResource Class";
 
 Record::Record(const QVariantHash &hash) :
     d(new Data)
