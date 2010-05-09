@@ -5,12 +5,24 @@
 
 #include <QActiveResource.h>
 #include <QDateTime>
+#include <QDebug>
 #include <ruby.h>
 
 typedef VALUE(*ARGS)(...);
 typedef int(*ITERATOR)(...);
 
+/*
+ * Modules
+ */
+
 static VALUE rb_mQAR;
+static VALUE rb_mActiveResource;
+
+/*
+ * Classes
+ */
+
+static VALUE rb_cActiveResourceBase;
 static VALUE rb_cQARParamList;
 static VALUE rb_cQARResource;
 
@@ -46,21 +58,38 @@ static QString to_s(VALUE value)
     return QString::fromUtf8(StringValuePtr(s));
 }
 
-static VALUE to_value(const QVariant &v)
+static VALUE to_value(const QVariant &v, VALUE = 0)
 {
     switch(v.type())
     {
     case QVariant::Hash:
     {
-        VALUE value = rb_hash_new();
+        VALUE attributes = rb_hash_new();
         QHash<QString, QVariant> hash = v.toHash();
+
+        if(hash.isEmpty())
+        {
+            /// Should this be Qnil?
+            return attributes;
+        }
+
+        Q_ASSERT(hash.contains(QACTIVERESOURCE_CLASS_KEY));
+
+        QString className = hash[QACTIVERESOURCE_CLASS_KEY].toString();
+        VALUE klass = rb_define_class(className.toUtf8(), rb_cActiveResourceBase);
 
         for(QHash<QString, QVariant>::ConstIterator it = hash.begin(); it != hash.end(); ++it)
         {
-            rb_hash_aset(value, rb_str_new2(it.key().toUtf8()), to_value(it.value()));
+            if(it.key() != QACTIVERESOURCE_CLASS_KEY)
+            {
+                rb_hash_aset(attributes, rb_str_new2(it.key().toUtf8()), to_value(it.value()));
+            }
         }
 
-        return value;
+        VALUE record = rb_funcall(klass, _allocate, 0);
+        rb_ivar_set(record, __attributes, attributes);
+        rb_ivar_set(record, __prefix_options, rb_hash_new());
+        return record;
     }
     case QVariant::List:
     {
@@ -88,14 +117,6 @@ static VALUE to_value(const QVariant &v)
     default:
         return rb_str_new2(v.toString().toUtf8());
     }
-}
-
-static VALUE to_record(VALUE klass, const QVariant &v)
-{
-    VALUE record = rb_funcall(klass, _allocate, 0);
-    rb_ivar_set(record, __attributes, to_value(v));
-    rb_ivar_set(record, __prefix_options, rb_hash_new());
-    return record;
 }
 
 /*
@@ -186,20 +207,20 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
         if(current == _one)
         {
             resource->setResource(to_s(rb_funcall(self, _element_name, 0)));
-            return to_record(self, resource->find(QActiveResource::FindOne, from, *params_pointer));
+            return to_value(resource->find(QActiveResource::FindOne, from, *params_pointer), self);
         }
         else if(current == _first)
         {
-            return to_record(self, resource->find(QActiveResource::FindFirst, from, *params_pointer));
+            return to_value(resource->find(QActiveResource::FindFirst, from, *params_pointer), self);
         }
         else if(current == _last)
         {
-            return to_record(self, resource->find(QActiveResource::FindLast, from, *params_pointer));
+            return to_value(resource->find(QActiveResource::FindLast, from, *params_pointer), self);
         }
         else if(current != _all)
         {
             resource->setResource(to_s(rb_funcall(self, _element_name, 0)));
-            return to_record(self, resource->find(to_s(argv[0])));
+            return to_value(resource->find(to_s(argv[0])), self);
         }
     }
 
@@ -210,7 +231,7 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
 
     for(int i = 0; i < records.length(); i++)
     {
-        rb_ary_store(array, i, to_record(self, records[i]));
+        rb_ary_store(array, i, to_value(records[i], self));
     }
 
     return array;
@@ -220,6 +241,9 @@ extern "C"
 {
     void Init_QAR(void)
     {
+        rb_mActiveResource = rb_define_module("ActiveResource");
+        rb_cActiveResourceBase = rb_define_class_under(rb_mActiveResource, "Base", rb_cObject);
+
         rb_mQAR = rb_define_module("QAR");
 
         rb_cQARParamList = rb_define_class_under(rb_mQAR, "ParamList", rb_cObject);

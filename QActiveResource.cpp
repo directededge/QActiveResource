@@ -69,7 +69,22 @@ static QVariant::Type lookupType(const QString &name)
 
 static void assign(Record *record, QString name, const QVariant &value)
 {
-    (*record)[name.replace('-', '_')] = value;
+    if(name == QACTIVERESOURCE_CLASS_KEY)
+    {
+        QString className = value.toString();
+        QRegExp re("(^|-)([a-z])");
+
+        while(className.indexOf(re) >= 0)
+        {
+            className.replace(re.cap(0), re.cap(2).toUpper());
+        }
+
+        (*record)[name] = className;
+    }
+    else
+    {
+        (*record)[name.replace('-', '_')] = value;
+    }
 }
 
 static QDateTime toDateTime(const QString &s)
@@ -87,7 +102,7 @@ static QDateTime toDateTime(const QString &s)
 static QVariant reader(QXmlStreamReader &xml, bool advance = true)
 {
     Record record;
-    QString firstElement;
+    QString elementName;
 
     while(!xml.atEnd())
     {
@@ -97,9 +112,9 @@ static QVariant reader(QXmlStreamReader &xml, bool advance = true)
         }
         if(xml.tokenType() == QXmlStreamReader::StartElement)
         {
-            if(firstElement.isNull())
+            if(elementName.isNull())
             {
-                firstElement = xml.name().toString();
+                elementName = xml.name().toString();
             }
 
             QString type = xml.attributes().value("type").toString();
@@ -124,7 +139,7 @@ static QVariant reader(QXmlStreamReader &xml, bool advance = true)
             {
                 assign(&record, xml.name().toString(), QVariant());
             }
-            else if(advance && xml.name() != firstElement)
+            else if(advance && xml.name() != elementName)
             {
                 QVariant value;
                 QString text = xml.readElementText();
@@ -151,8 +166,9 @@ static QVariant reader(QXmlStreamReader &xml, bool advance = true)
             }
         }
         if(xml.tokenType() == QXmlStreamReader::EndElement &&
-           !firstElement.isNull() && firstElement == xml.name())
+           !elementName.isNull() && elementName == xml.name())
         {
+            assign(&record, QACTIVERESOURCE_CLASS_KEY, elementName);
             return record;
         }
 
@@ -183,7 +199,7 @@ static RecordList fetch(QUrl url, bool followRedirects = false)
             records.append(v.toHash());
         }
     }
-    else if(value.type() == QVariant::Hash && value.toHash().size() == 1)
+    else if(value.type() == QVariant::Hash && value.toHash().size() == 2)
     {
         foreach(QVariant v, value.toHash().begin()->toList())
         {

@@ -7,6 +7,8 @@
 #include <QHash>
 #include <QVariant>
 
+#define QACTIVERESOURCE_CLASS_KEY "QActiveResource Class"
+
 namespace QActiveResource
 {
     typedef QHash<QString, QVariant> Record;
