@@ -3,7 +3,7 @@
  * Copyright (C) 2010, Directed Edge, Inc. | Licensed under the MPL and LGPL
  */
 
-#include <QActiveResource.h>
+#include "../QActiveResource.h"
 #include <QDateTime>
 #include <QDebug>
 #include <ruby.h>
@@ -40,6 +40,7 @@ static const ID _follow_redirects = rb_intern("follow_redirects");
 static const ID _new = rb_intern("new");
 static const ID _one = rb_intern("one");
 static const ID _params = rb_intern("params");
+static const ID _raise = rb_intern("raise");
 static const ID _site = rb_intern("site");
 static const ID _to_s = rb_intern("to_s");
 static const ID _last = rb_intern("last");
@@ -201,41 +202,69 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
     QString from;
     resource->setResource(to_s(rb_funcall(self, _collection_name, 0)));
 
-    if(argc >= 1)
+    try
     {
-        ID current = SYM2ID(argv[0]);
+        if(argc >= 1)
+        {
+            ID current = SYM2ID(argv[0]);
 
-        if(current == _one)
-        {
-            resource->setResource(to_s(rb_funcall(self, _element_name, 0)));
-            return to_value(resource->find(QActiveResource::FindOne, from, *params_pointer), self);
+            if(current == _one)
+            {
+                resource->setResource(to_s(rb_funcall(self, _element_name, 0)));
+                return to_value(resource->find(QActiveResource::FindOne, from, *params_pointer), self);
+            }
+            else if(current == _first)
+            {
+                return to_value(resource->find(QActiveResource::FindFirst, from, *params_pointer), self);
+            }
+            else if(current == _last)
+            {
+                return to_value(resource->find(QActiveResource::FindLast, from, *params_pointer), self);
+            }
+            else if(current != _all)
+            {
+                resource->setResource(to_s(rb_funcall(self, _element_name, 0)));
+                return to_value(resource->find(to_s(argv[0])), self);
+            }
         }
-        else if(current == _first)
+
+        QActiveResource::RecordList records =
+            resource->find(QActiveResource::FindAll, from, *params_pointer);
+        VALUE array = rb_ary_new2(records.length());
+
+        for(int i = 0; i < records.length(); i++)
         {
-            return to_value(resource->find(QActiveResource::FindFirst, from, *params_pointer), self);
+            rb_ary_store(array, i, to_value(records[i], self));
         }
-        else if(current == _last)
-        {
-            return to_value(resource->find(QActiveResource::FindLast, from, *params_pointer), self);
-        }
-        else if(current != _all)
-        {
-            resource->setResource(to_s(rb_funcall(self, _element_name, 0)));
-            return to_value(resource->find(to_s(argv[0])), self);
-        }
+
+        return array;
     }
-
-    QActiveResource::RecordList records =
-        resource->find(QActiveResource::FindAll, from, *params_pointer);
-
-    VALUE array = rb_ary_new2(records.length());
-
-    for(int i = 0; i < records.length(); i++)
+    catch(QActiveResource::Exception ex)
     {
-        rb_ary_store(array, i, to_value(records[i], self));
-    }
 
-    return array;
+        #define AR_TEST_EXCEPTION(name)                                 \
+            if(ex.type() == QActiveResource::Exception::name)           \
+            {                                                           \
+                QString s("ActiveResource::" #name ".new(\"%1\")");     \
+                VALUE e = rb_eval_string(s.arg(ex.message()).toUtf8()); \
+                rb_funcall(rb_mKernel, _raise, 1, e);                   \
+            }                                                           \
+
+        AR_TEST_EXCEPTION(ConnectionError);
+        AR_TEST_EXCEPTION(TimeoutError);
+        AR_TEST_EXCEPTION(SSLError);
+        AR_TEST_EXCEPTION(ClientError);
+        AR_TEST_EXCEPTION(BadRequest);
+        AR_TEST_EXCEPTION(UnauthorizedAccess);
+        AR_TEST_EXCEPTION(ForbiddenAccess);
+        AR_TEST_EXCEPTION(ResourceNotFound);
+        AR_TEST_EXCEPTION(MethodNotAllowed);
+        AR_TEST_EXCEPTION(ResourceConflict);
+        AR_TEST_EXCEPTION(ResourceGone);
+        AR_TEST_EXCEPTION(ServerError);
+
+        return Qnil;
+    }
 }
 
 extern "C"

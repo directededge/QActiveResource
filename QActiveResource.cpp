@@ -21,6 +21,57 @@ static size_t writer(void *ptr, size_t size, size_t nmemb, void *stream)
 
 namespace HTTP
 {
+    void handleError(int result, long httpCode, const QString &message)
+    {
+        Exception::Type type = Exception::ConnectionError;
+
+        if(result == CURLE_OPERATION_TIMEOUTED)
+        {
+            type = Exception::ConnectionError;
+        }
+        else if(result == CURLE_SSL_CONNECT_ERROR)
+        {
+            type = Exception::SSLError;
+        }
+        else if(httpCode >= 400 && httpCode <= 499)
+        {
+            if(httpCode == 400)
+            {
+                type = Exception::BadRequest;
+            }
+            else if(httpCode == 401)
+            {
+                type = Exception::UnauthorizedAccess;
+            }
+            else if(httpCode == 403)
+            {
+                type = Exception::ForbiddenAccess;
+            }
+            else if(httpCode == 404)
+            {
+                type = Exception::ResourceNotFound;
+            }
+            else if(httpCode == 409)
+            {
+                type = Exception::ResourceConflict;
+            }
+            else if(httpCode == 410)
+            {
+                type = Exception::ResourceGone;
+            }
+            else
+            {
+                type = Exception::ClientError;
+            }
+        }
+        else if(httpCode >= 500 && httpCode < 600)
+        {
+            type = Exception::ServerError;
+        }
+
+        throw Exception(type, message);
+    }
+
     QByteArray get(const QUrl &url, bool followRedirects = false)
     {
         QByteArray data;
@@ -53,12 +104,25 @@ namespace HTTP
             }
             while((result = curl_easy_perform(curl)) != 0 && ++retry <= maxRetry);
 
-            if(result != 0)
-            {
-                qDebug() << "libcurl error" << result << errorBuffer << "for" << url;
-            }
+            long httpCode = 0;
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
 
-            curl_easy_cleanup(curl);
+            if(result != 0 || httpCode >= 400)
+            {
+                QString message;
+
+                if(result != 0)
+                {
+                    QString::fromUtf8(errorBuffer);
+                }
+
+                curl_easy_cleanup(curl);
+                handleError(result, httpCode, message);
+            }
+            else
+            {
+                curl_easy_cleanup(curl);
+            }
         }
 
         return data;
@@ -269,6 +333,33 @@ static RecordList fetch(QUrl url, bool followRedirects = false)
 }
 
 /*
+ * Exception
+ */
+
+Exception::Data::Data(Type t, const QString &m) :
+    type(t),
+    message(m)
+{
+
+}
+
+Exception::Exception(Type type, const QString &message) :
+    d(new Data(type, message))
+{
+
+}
+
+Exception::Type Exception::type() const
+{
+    return d->type;
+}
+
+QString Exception::message() const
+{
+    return d->message;
+}
+
+/*
  * Record
  */
 
@@ -327,7 +418,6 @@ Record::ConstIterator Record::end() const
 {
     return d->hash.end();
 }
-
 
 /*
  * Param::Data

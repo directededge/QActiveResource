@@ -7,14 +7,50 @@
 #include <QHash>
 #include <QVariant>
 
+#define QAR_EXPORT __attribute__((visibility("default")))
+
 namespace QActiveResource
 {
+    class QAR_EXPORT Exception
+    {
+    public:
+        enum Type
+        {
+            ConnectionError,
+            TimeoutError,
+            SSLError,
+            ClientError,
+            BadRequest,
+            UnauthorizedAccess,
+            ForbiddenAccess,
+            ResourceNotFound,
+            MethodNotAllowed,
+            ResourceConflict,
+            ResourceGone,
+            ServerError
+        };
+
+        Exception(Type type, const QString &message);
+
+        Type type() const;
+        QString message() const;
+
+    private:
+        struct Data : public QSharedData
+        {
+            Data(Type t, const QString &m);
+            Type type;
+            QString message;
+        };
+        QSharedDataPointer<Data> d;
+    };
+
     /*!
      * A thin wrapper around a QVariantHash that preserves the element's
      * class name.
      */
 
-    class Record
+    class QAR_EXPORT Record
     {
     public:
         Record(const QVariantHash &hash = QVariantHash());
@@ -48,7 +84,7 @@ namespace QActiveResource
      * equivalent.
      */
 
-    class Param
+    class QAR_EXPORT Param
     {
     public:
         Param();
@@ -98,7 +134,7 @@ namespace QActiveResource
      * and resource name are provided in the constructor.
      */
 
-    class Resource
+    class QAR_EXPORT Resource
     {
     public:
         /*!
