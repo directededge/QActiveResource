@@ -7,11 +7,39 @@
 #include <QHash>
 #include <QVariant>
 
-#define QACTIVERESOURCE_CLASS_KEY "QActiveResource Class"
-
 namespace QActiveResource
 {
-    typedef QHash<QString, QVariant> Record;
+    /*!
+     * A thin wrapper around a QVariantHash that preserves the element's
+     * class name.
+     */
+
+    class Record
+    {
+    public:
+        Record(const QVariantHash &hash = QVariantHash());
+        Record(const QVariant &v);
+        bool isEmpty() const;
+        QVariant &operator[](const QString &key);
+        QVariant operator[](const QString &key) const;
+        QString className() const;
+        void setClassName(const QString &name);
+        operator QVariant() const;
+
+        typedef QVariantHash::ConstIterator ConstIterator;
+
+        ConstIterator begin() const;
+        ConstIterator end() const;
+
+    private:
+        struct Data : public QSharedData
+        {
+            QVariantHash hash;
+            QString className;
+        };
+        QSharedDataPointer<Data> d;
+    };
+
     typedef QList<Record> RecordList;
 
     /*!

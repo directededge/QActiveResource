@@ -69,22 +69,7 @@ static QVariant::Type lookupType(const QString &name)
 
 static void assign(Record *record, QString name, const QVariant &value)
 {
-    if(name == QACTIVERESOURCE_CLASS_KEY)
-    {
-        QString className = value.toString();
-        QRegExp re("(^|-)([a-z])");
-
-        while(className.indexOf(re) >= 0)
-        {
-            className.replace(re.cap(0), re.cap(2).toUpper());
-        }
-
-        (*record)[name] = className;
-    }
-    else
-    {
-        (*record)[name.replace('-', '_')] = value;
-    }
+    (*record)[name.replace('-', '_')] = value;
 }
 
 static QDateTime toDateTime(const QString &s)
@@ -97,6 +82,18 @@ static QDateTime toDateTime(const QString &s)
     int zoneMinutes = s.right(2).toInt();
 
     return time.addSecs(-1 * (60 * zoneHours + zoneMinutes) * 60);
+}
+
+static QString toClassName(QString name)
+{
+    QRegExp re("(^|-)([a-z])");
+
+    while(name.indexOf(re) >= 0)
+    {
+        name.replace(re.cap(0), re.cap(2).toUpper());
+    }
+
+    return name;
 }
 
 static QVariant reader(QXmlStreamReader &xml, bool advance = true)
@@ -168,7 +165,7 @@ static QVariant reader(QXmlStreamReader &xml, bool advance = true)
         if(xml.tokenType() == QXmlStreamReader::EndElement &&
            !elementName.isNull() && elementName == xml.name())
         {
-            assign(&record, QACTIVERESOURCE_CLASS_KEY, elementName);
+            record.setClassName(toClassName(elementName));
             return record;
         }
 
@@ -213,6 +210,69 @@ static RecordList fetch(QUrl url, bool followRedirects = false)
 
     return records;
 }
+
+/*
+ * Record
+ */
+
+static const QString QActiveResourceClassKey = "QActiveResource Class";
+
+Record::Record(const QVariantHash &hash) :
+    d(new Data)
+{
+    d->hash = hash;
+    d->className = d->hash.take(QActiveResourceClassKey).toString();
+}
+
+Record::Record(const QVariant &v) :
+    d(new Data)
+{
+    d->hash = v.toHash();
+    d->className = d->hash.take(QActiveResourceClassKey).toString();
+}
+
+QVariant &Record::operator[](const QString &key)
+{
+    return d->hash[key];
+}
+
+QVariant Record::operator[](const QString &key) const
+{
+    return d->hash[key];
+}
+
+bool Record::isEmpty() const
+{
+    return d->hash.isEmpty();
+}
+
+QString Record::className() const
+{
+    return d->className;
+}
+
+void Record::setClassName(const QString &name)
+{
+    d->className = name;
+}
+
+Record::operator QVariant() const
+{
+    QVariantHash hash = d->hash;
+    hash[QActiveResourceClassKey] = d->className;
+    return hash;
+}
+
+Record::ConstIterator Record::begin() const
+{
+    return d->hash.begin();
+}
+
+Record::ConstIterator Record::end() const
+{
+    return d->hash.end();
+}
+
 
 /*
  * Param::Data

@@ -64,40 +64,33 @@ static VALUE to_value(const QVariant &v, VALUE base, bool isChild = false)
     {
     case QVariant::Hash:
     {
-        VALUE attributes = rb_hash_new();
-        QHash<QString, QVariant> hash = v.toHash();
+        QActiveResource::Record record = v;
 
-        if(hash.isEmpty())
+        VALUE attributes = rb_hash_new();
+
+        if(record.isEmpty())
         {
-            /// Should this be Qnil?
             return attributes;
         }
-
-        Q_ASSERT(hash.contains(QACTIVERESOURCE_CLASS_KEY));
-
-        QString className = hash[QACTIVERESOURCE_CLASS_KEY].toString();
 
         VALUE klass = base;
 
         if(isChild)
         {
-            klass = rb_define_class_under(base, className.toUtf8(), rb_cActiveResourceBase);
+            klass = rb_define_class_under(base, record.className().toUtf8(), rb_cActiveResourceBase);
         }
 
-        for(QHash<QString, QVariant>::ConstIterator it = hash.begin(); it != hash.end(); ++it)
+        for(QActiveResource::Record::ConstIterator it = record.begin(); it != record.end(); ++it)
         {
-            if(it.key() != QACTIVERESOURCE_CLASS_KEY)
-            {
-                VALUE key = rb_str_new2(it.key().toUtf8());
-                VALUE value = to_value(it.value(), base, true);
-                rb_hash_aset(attributes, key, value);
-            }
+            VALUE key = rb_str_new2(it.key().toUtf8());
+            VALUE value = to_value(it.value(), base, true);
+            rb_hash_aset(attributes, key, value);
         }
 
-        VALUE record = rb_funcall(klass, _allocate, 0);
-        rb_ivar_set(record, __attributes, attributes);
-        rb_ivar_set(record, __prefix_options, rb_hash_new());
-        return record;
+        VALUE value = rb_funcall(klass, _allocate, 0);
+        rb_ivar_set(value, __attributes, attributes);
+        rb_ivar_set(value, __prefix_options, rb_hash_new());
+        return value;
     }
     case QVariant::List:
     {
