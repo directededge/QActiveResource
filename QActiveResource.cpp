@@ -28,16 +28,21 @@ namespace HTTP
 
         static const int maxRetry = 1;
         int retry = 0;
+        int result = 0;
 
         if(curl)
         {
+            QByteArray encodedUrl = url.toEncoded();
+            QByteArray errorBuffer(CURL_ERROR_SIZE, 0);
+
             do
             {
-                curl_easy_setopt(curl, CURLOPT_URL, url.toEncoded().data());
+                curl_easy_setopt(curl, CURLOPT_URL, encodedUrl.data());
                 curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writer);
                 curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) &data);
                 curl_easy_setopt(curl, CURLOPT_TIMEOUT, 25);
                 curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+                curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer.data());
 
                 if(followRedirects)
                 {
@@ -46,7 +51,13 @@ namespace HTTP
                     curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 2);
                 }
             }
-            while(curl_easy_perform(curl) != 0 && ++retry <= maxRetry);
+            while((result = curl_easy_perform(curl)) != 0 && ++retry <= maxRetry);
+
+            if(result != 0)
+            {
+                qDebug() << "libcurl error" << result << errorBuffer << "for" << url;
+            }
+
             curl_easy_cleanup(curl);
         }
 
