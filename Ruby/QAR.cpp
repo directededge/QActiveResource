@@ -36,7 +36,6 @@ static const ID _at = rb_intern("at");
 static const ID _collection_name = rb_intern("collection_name");
 static const ID _element_name = rb_intern("element_name");
 static const ID _first = rb_intern("first");
-static const ID _follow_redirects = rb_intern("follow_redirects");
 static const ID _new = rb_intern("new");
 static const ID _one = rb_intern("one");
 static const ID _params = rb_intern("params");
@@ -165,7 +164,7 @@ static int params_hash_iterator(VALUE key, VALUE value, VALUE params)
  * QAR
  */
 
-static VALUE qar_find(int argc, VALUE *argv, VALUE self)
+static QActiveResource::Resource *get_resource(VALUE self)
 {
     VALUE member = rb_ivar_get(self, __qar_resource);
     QActiveResource::Resource *resource = 0;
@@ -182,6 +181,13 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
         Data_Get_Struct(member, QActiveResource::Resource, resource);
     }
 
+    return resource;
+}
+
+static VALUE qar_find(int argc, VALUE *argv, VALUE self)
+{
+    QActiveResource::Resource *resource = get_resource(self);
+
     VALUE params = param_list_allocate(rb_cData);
 
     if(argc >= 2 && TYPE(argv[1]) == T_HASH)
@@ -192,9 +198,6 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
         {
             rb_hash_foreach(params_hash, (ITERATOR) params_hash_iterator, params);
         }
-
-        VALUE follow_redirects = rb_hash_aref(argv[1], ID2SYM(_follow_redirects));
-        resource->setFollowRedirects(follow_redirects == Qtrue);
     }
 
     QActiveResource::ParamList *params_pointer;
@@ -252,7 +255,7 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
                 QString s("ActiveResource::" #name ".new(\"%1\")");     \
                 VALUE e = rb_eval_string(s.arg(ex.message()).toUtf8()); \
                 rb_funcall(rb_mKernel, _raise, 1, e);                   \
-            }                                                           \
+            }
 
         AR_TEST_EXCEPTION(ConnectionError);
         AR_TEST_EXCEPTION(TimeoutError);
@@ -271,6 +274,13 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
     }
 }
 
+static VALUE set_follow_redirects(VALUE self, VALUE follow)
+{
+    QActiveResource::Resource *resource = get_resource(self);
+    resource->setFollowRedirects(follow == Qtrue);
+    return follow;
+}
+
 extern "C"
 {
     void Init_QAR(void)
@@ -287,5 +297,6 @@ extern "C"
         rb_define_alloc_func(rb_cQARResource, resource_allocate);
 
         rb_define_method(rb_mQAR, "find", (ARGS) qar_find, -1);
+        rb_define_method(rb_mQAR, "follow_redirects=", (ARGS) set_follow_redirects, 1);
     }
 }
