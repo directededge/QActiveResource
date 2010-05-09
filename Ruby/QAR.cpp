@@ -78,7 +78,8 @@ static VALUE to_value(const QVariant &v, VALUE base, bool isChild = false)
 
         if(isChild)
         {
-            klass = rb_define_class_under(base, record.className().toUtf8(), rb_cActiveResourceBase);
+            QString name = record.className();
+            klass = rb_define_class_under(base, name.toUtf8(), rb_cActiveResourceBase);
         }
 
         for(QActiveResource::Record::ConstIterator it = record.begin(); it != record.end(); ++it)
@@ -211,15 +212,18 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
             if(current == _one)
             {
                 resource->setResource(to_s(rb_funcall(self, _element_name, 0)));
-                return to_value(resource->find(QActiveResource::FindOne, from, *params_pointer), self);
+                QVariant v = resource->find(QActiveResource::FindOne, from, *params_pointer);
+                return to_value(v, self);
             }
             else if(current == _first)
             {
-                return to_value(resource->find(QActiveResource::FindFirst, from, *params_pointer), self);
+                QVariant v = resource->find(QActiveResource::FindFirst, from, *params_pointer);
+                return to_value(v, self);
             }
             else if(current == _last)
             {
-                return to_value(resource->find(QActiveResource::FindLast, from, *params_pointer), self);
+                QVariant v = resource->find(QActiveResource::FindLast, from, *params_pointer);
+                return to_value(v, self);
             }
             else if(current != _all)
             {
