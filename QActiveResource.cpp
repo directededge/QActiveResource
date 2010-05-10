@@ -23,11 +23,13 @@ static size_t header(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     QByteArray header((const char *) ptr, size * nmemb);
 
-    QList<QByteArray> elements = header.split(' ');
+    int index = header.indexOf(": ");
 
-    if(elements[0] == "Location:" && elements.length() >= 2)
+    if(index >= 0)
     {
-        *reinterpret_cast<QByteArray *>(stream) = elements[1].simplified();
+        QByteArray key = header.left(index).trimmed();
+        QByteArray value = header.mid(index + 2).trimmed();
+        (*reinterpret_cast<Response::Headers *>(stream))[key] = value;
     }
 
     return size * nmemb;
@@ -35,7 +37,7 @@ static size_t header(void *ptr, size_t size, size_t nmemb, void *stream)
 
 namespace HTTP
 {
-    void handleError(int result, long httpCode, const QString &message)
+    void handleError(int result, const Response &response, const QString &message)
     {
         Exception::Type type = Exception::ConnectionError;
 
@@ -47,29 +49,29 @@ namespace HTTP
         {
             type = Exception::SSLError;
         }
-        else if(httpCode >= 400 && httpCode <= 499)
+        else if(response.code() >= 400 && response.code() <= 499)
         {
-            if(httpCode == 400)
+            if(response.code() == 400)
             {
                 type = Exception::BadRequest;
             }
-            else if(httpCode == 401)
+            else if(response.code() == 401)
             {
                 type = Exception::UnauthorizedAccess;
             }
-            else if(httpCode == 403)
+            else if(response.code() == 403)
             {
                 type = Exception::ForbiddenAccess;
             }
-            else if(httpCode == 404)
+            else if(response.code() == 404)
             {
                 type = Exception::ResourceNotFound;
             }
-            else if(httpCode == 409)
+            else if(response.code() == 409)
             {
                 type = Exception::ResourceConflict;
             }
-            else if(httpCode == 410)
+            else if(response.code() == 410)
             {
                 type = Exception::ResourceGone;
             }
@@ -78,12 +80,12 @@ namespace HTTP
                 type = Exception::ClientError;
             }
         }
-        else if(httpCode >= 500 && httpCode < 600)
+        else if(response.code() >= 500 && response.code() < 600)
         {
             type = Exception::ServerError;
         }
 
-        throw Exception(type, message);
+        throw Exception(type, response, message);
     }
 
     QByteArray get(QUrl url, bool followRedirects = false)
@@ -97,10 +99,10 @@ namespace HTTP
         {
             QByteArray encodedUrl = url.toEncoded();
             QByteArray errorBuffer(CURL_ERROR_SIZE, 0);
-            QByteArray location;
+            Response::Headers headers;
 
             curl_easy_setopt(curl, CURLOPT_URL, encodedUrl.data());
-            curl_easy_setopt(curl, CURLOPT_WRITEHEADER, (void *) &location);
+            curl_easy_setopt(curl, CURLOPT_WRITEHEADER, (void *) &headers);
             curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header);
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writer);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) &data);
@@ -117,19 +119,20 @@ namespace HTTP
             if(httpCode >= 300 && httpCode < 400)
             {
                 qDebug() << (followRedirects ? "Following" : "Not following") << "redirect from"
-                         << url.toString(QUrl::RemoveUserInfo) << "to" << location;
+                         << url.toString(QUrl::RemoveUserInfo) << "to" << headers["Location"];
 
                 curl_easy_cleanup(curl);
 
-                if(!followRedirects || location.isEmpty())
+                if(!followRedirects || headers["Location"].isEmpty())
                 {
-                    throw Exception(Exception::Redirection, location);
+                    Response response(httpCode, headers, data);
+                    throw Exception(Exception::Redirection, response, headers["Location"]);
                 }
                 else
                 {
                     QString user = url.userName();
                     QString pass = url.password();
-                    url = location;
+                    url = headers["Location"];
                     url.setUserName(user);
                     url.setPassword(pass);
                     return get(url);
@@ -145,7 +148,7 @@ namespace HTTP
                 }
 
                 curl_easy_cleanup(curl);
-                handleError(result, httpCode, message);
+                handleError(result, Response(httpCode, headers, data), message);
             }
             else
             {
@@ -361,18 +364,52 @@ static RecordList fetch(QUrl url, bool followRedirects = false)
 }
 
 /*
+ * Response
+ */
+
+Response::Data::Data(Code c, const Headers &h, const QByteArray &d) :
+    code(c),
+    headers(h),
+    data(d)
+{
+
+}
+
+Response::Response(Code code, const Headers &headers, const QByteArray &data) :
+    d(new Data(code, headers, data))
+{
+
+}
+
+Response::Code Response::code() const
+{
+    return d->code;
+}
+
+Response::Headers Response::headers() const
+{
+    return d->headers;
+}
+
+QByteArray Response::data() const
+{
+    return d->data;
+}
+
+/*
  * Exception
  */
 
-Exception::Data::Data(Type t, const QString &m) :
+Exception::Data::Data(Type t, const Response &r, const QString &m) :
     type(t),
+    response(r),
     message(m)
 {
 
 }
 
-Exception::Exception(Type type, const QString &message) :
-    d(new Data(type, message))
+Exception::Exception(Type type, const Response &response, const QString &message) :
+    d(new Data(type, response, message))
 {
 
 }
@@ -380,6 +417,11 @@ Exception::Exception(Type type, const QString &message) :
 Exception::Type Exception::type() const
 {
     return d->type;
+}
+
+Response Exception::response() const
+{
+    return d->response;
 }
 
 QString Exception::message() const

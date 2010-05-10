@@ -11,6 +11,26 @@
 
 namespace QActiveResource
 {
+    class QAR_EXPORT Response
+    {
+    public:
+        typedef int Code;
+        typedef QHash<QString, QString> Headers;
+        Response(Code code, const Headers &headers, const QByteArray &data);
+        Code code() const;
+        Headers headers() const;
+        QByteArray data() const;
+    private:
+        struct Data : public QSharedData
+        {
+            Data(Code c, const Headers &h, const QByteArray &d);
+            Code code;
+            Headers headers;
+            QByteArray data;
+        };
+        QSharedDataPointer<Data> d;
+    };
+
     class QAR_EXPORT Exception
     {
     public:
@@ -31,16 +51,18 @@ namespace QActiveResource
             ServerError
         };
 
-        Exception(Type type, const QString &message);
+        Exception(Type type, const Response &response, const QString &message);
 
         Type type() const;
+        Response response() const;
         QString message() const;
 
     private:
         struct Data : public QSharedData
         {
-            Data(Type t, const QString &m);
+            Data(Type t, const Response &r, const QString &m);
             Type type;
+            Response response;
             QString message;
         };
         QSharedDataPointer<Data> d;
