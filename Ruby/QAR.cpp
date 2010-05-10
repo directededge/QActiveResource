@@ -221,6 +221,11 @@ static VALUE response_initialize(VALUE self, VALUE code, VALUE headers, VALUE bo
     rb_ivar_set(self, __body, body);
 }
 
+static VALUE response_index_operator(VALUE self, VALUE index)
+{
+    return rb_hash_aref(rb_ivar_get(self, __headers), index);
+}
+
 /*
  * QAR
  */
@@ -381,6 +386,7 @@ extern "C"
 
         DEFINE_CLASS(QAR, Response);
         rb_define_method(rb_cQARResponse, "initialize", (ARGS) response_initialize, 3);
+        rb_define_method(rb_cQARResponse, "[]", (ARGS) response_index_operator, 1);
         rb_attr(rb_cQARResponse, _code, 1, 0, Qfalse);
         rb_attr(rb_cQARResponse, _headers, 1, 0, Qfalse);
         rb_attr(rb_cQARResponse, _body, 1, 0, Qfalse);
