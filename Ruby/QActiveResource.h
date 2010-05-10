@@ -1,0 +1,1 @@
+../QActiveResource.h

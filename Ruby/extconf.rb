@@ -1,9 +1,6 @@
 require 'mkmf'
 dir_config("QAR")
 
-$CFLAGS << " -I/usr/local/include -I.."
-$LIBS << " -lqactiveresource"
-
 qmake_path = `which qmake`.chomp
 
 if qmake_path.empty?
