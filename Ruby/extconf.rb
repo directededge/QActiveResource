@@ -1,7 +1,7 @@
 require 'mkmf'
 dir_config("QAR")
 
-$LIBS << "-lcurl"
+$LIBS << " -lcurl"
 
 qmake_path = `which qmake`.chomp
 
