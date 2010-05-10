@@ -17,8 +17,9 @@ QAR:
 
 And then use find as you normally would.  There are a few subtle differences:
 
-- QAR uses a hash (with a specialization to allow for access by method) rather
-  than special objects.
+- QAR uses its own Response class (QAR::Response) for error handling rather
+  the Ruby standard library classes, but does provide code, headers and body
+  methods, so it should fit most needs
 
 - QAR also provides a :follow_redirects => true option for following redirects
   automatically (an annoying missing feature in the usual find.
