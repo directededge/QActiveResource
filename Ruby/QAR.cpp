@@ -244,14 +244,13 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
     resource->setBase(to_s(rb_funcall(self, _site, 0)));
 
     QString from;
-
     VALUE params = param_list_allocate(rb_cData);
 
     if(argc >= 2 && TYPE(argv[1]) == T_HASH)
     {
         VALUE params_hash = rb_hash_aref(argv[1], ID2SYM(_params));
 
-        if(params_hash != Qnil)
+        if(params_hash != Qnil && TYPE(params_hash) == T_HASH)
         {
             rb_hash_foreach(params_hash, (ITERATOR) params_hash_iterator, params);
         }
@@ -261,7 +260,6 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
 
     QActiveResource::ParamList *params_pointer;
     Data_Get_Struct(params, QActiveResource::ParamList, params_pointer);
-
     resource->setResource(to_s(rb_funcall(self, _collection_name, 0)));
 
     try
