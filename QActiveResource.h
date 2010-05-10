@@ -19,6 +19,7 @@ namespace QActiveResource
             ConnectionError,
             TimeoutError,
             SSLError,
+            Redirection,
             ClientError,
             BadRequest,
             UnauthorizedAccess,

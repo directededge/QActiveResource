@@ -19,6 +19,20 @@ static size_t writer(void *ptr, size_t size, size_t nmemb, void *stream)
     return size * nmemb;
 }
 
+static size_t header(void *ptr, size_t size, size_t nmemb, void *stream)
+{
+    QByteArray header((const char *) ptr, size * nmemb);
+
+    QList<QByteArray> elements = header.split(' ');
+
+    if(elements[0] == "Location:" && elements.length() >= 2)
+    {
+        *reinterpret_cast<QByteArray *>(stream) = elements[1].simplified();
+    }
+
+    return size * nmemb;
+}
+
 namespace HTTP
 {
     void handleError(int result, long httpCode, const QString &message)
@@ -72,42 +86,56 @@ namespace HTTP
         throw Exception(type, message);
     }
 
-    QByteArray get(const QUrl &url, bool followRedirects = false)
+    QByteArray get(QUrl url, bool followRedirects = false)
     {
         QByteArray data;
         CURL *curl = curl_easy_init();
 
-        static const int maxRetry = 1;
-        int retry = 0;
         int result = 0;
 
         if(curl)
         {
             QByteArray encodedUrl = url.toEncoded();
             QByteArray errorBuffer(CURL_ERROR_SIZE, 0);
+            QByteArray location;
 
-            do
-            {
-                curl_easy_setopt(curl, CURLOPT_URL, encodedUrl.data());
-                curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writer);
-                curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) &data);
-                curl_easy_setopt(curl, CURLOPT_TIMEOUT, 25);
-                curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
-                curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer.data());
+            curl_easy_setopt(curl, CURLOPT_URL, encodedUrl.data());
+            curl_easy_setopt(curl, CURLOPT_WRITEHEADER, (void *) &location);
+            curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header);
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writer);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) &data);
+            curl_easy_setopt(curl, CURLOPT_TIMEOUT, 25);
+            curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+            curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer.data());
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
 
-                if(followRedirects)
-                {
-                    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
-                    curl_easy_setopt(curl, CURLOPT_UNRESTRICTED_AUTH, 1);
-                    curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 2);
-                }
-            }
-            while((result = curl_easy_perform(curl)) != 0 && ++retry <= maxRetry);
+            result = curl_easy_perform(curl);
 
             long httpCode = 0;
             curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
 
-            if(result != 0 || httpCode >= 400)
+            if(httpCode >= 300 && httpCode < 400)
+            {
+                qDebug() << (followRedirects ? "Following" : "Not following") << "redirect from"
+                         << url.toString(QUrl::RemoveUserInfo) << "to" << location;
+
+                curl_easy_cleanup(curl);
+
+                if(!followRedirects || location.isEmpty())
+                {
+                    throw Exception(Exception::Redirection, location);
+                }
+                else
+                {
+                    QString user = url.userName();
+                    QString pass = url.password();
+                    url = location;
+                    url.setUserName(user);
+                    url.setPassword(pass);
+                    return get(url);
+                }
+            }
+            else if(result != 0 || httpCode >= 400)
             {
                 QString message;
 

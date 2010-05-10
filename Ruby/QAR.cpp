@@ -3,7 +3,7 @@
  * Copyright (C) 2010, Directed Edge, Inc. | Licensed under the MPL and LGPL
  */
 
-#include "../QActiveResource.h"
+#include <QActiveResource.h>
 #include <QDateTime>
 #include <QDebug>
 #include <ruby.h>
@@ -35,6 +35,7 @@ static const ID _allocate = rb_intern("allocate");
 static const ID _at = rb_intern("at");
 static const ID _collection_name = rb_intern("collection_name");
 static const ID _element_name = rb_intern("element_name");
+static const ID _extend = rb_intern("extend");
 static const ID _first = rb_intern("first");
 static const ID _from = rb_intern("from");
 static const ID _new = rb_intern("new");
@@ -51,7 +52,7 @@ static const ID _last = rb_intern("last");
 
 static const ID __attributes = rb_intern("@attributes");
 static const ID __prefix_options = rb_intern("@prefix_options");
-static const ID __qar_resource = rb_intern("@qar_resource");
+static const ID __qar_resource = rb_intern("@@qar_resource");
 
 static QString to_s(VALUE value)
 {
@@ -167,27 +168,16 @@ static int params_hash_iterator(VALUE key, VALUE value, VALUE params)
 
 static QActiveResource::Resource *get_resource(VALUE self)
 {
-    VALUE member = rb_ivar_get(self, __qar_resource);
+    VALUE member = rb_cvar_get(self, __qar_resource);
     QActiveResource::Resource *resource = 0;
-
-    if(member == Qnil)
-    {
-        member = rb_funcall(rb_cQARResource, _new, 0);
-        rb_ivar_set(self, __qar_resource, member);
-        Data_Get_Struct(member, QActiveResource::Resource, resource);
-        resource->setBase(to_s(rb_funcall(self, _site, 0)));
-    }
-    else
-    {
-        Data_Get_Struct(member, QActiveResource::Resource, resource);
-    }
-
+    Data_Get_Struct(member, QActiveResource::Resource, resource);
     return resource;
 }
 
 static VALUE qar_find(int argc, VALUE *argv, VALUE self)
 {
     QActiveResource::Resource *resource = get_resource(self);
+    resource->setBase(to_s(rb_funcall(self, _site, 0)));
 
     QString from;
 
@@ -264,6 +254,7 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
         AR_TEST_EXCEPTION(ConnectionError);
         AR_TEST_EXCEPTION(TimeoutError);
         AR_TEST_EXCEPTION(SSLError);
+        AR_TEST_EXCEPTION(Redirection);
         AR_TEST_EXCEPTION(ClientError);
         AR_TEST_EXCEPTION(BadRequest);
         AR_TEST_EXCEPTION(UnauthorizedAccess);
@@ -285,6 +276,13 @@ static VALUE set_follow_redirects(VALUE self, VALUE follow)
     return follow;
 }
 
+static VALUE qar_extended(VALUE self, VALUE base)
+{
+    VALUE resource = rb_funcall(rb_cQARResource, _new, 0);
+    rb_cvar_set(base, __qar_resource, resource, false);
+    return Qnil;
+}
+
 extern "C"
 {
     void Init_QAR(void)
@@ -302,5 +300,6 @@ extern "C"
 
         rb_define_method(rb_mQAR, "find", (ARGS) qar_find, -1);
         rb_define_method(rb_mQAR, "follow_redirects=", (ARGS) set_follow_redirects, 1);
+        rb_define_singleton_method(rb_mQAR, "extended", (ARGS) qar_extended, 1);
     }
 }
