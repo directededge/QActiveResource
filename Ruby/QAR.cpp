@@ -286,7 +286,6 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
             }
             else if(current != _all)
             {
-                resource->setResource(to_s(rb_funcall(self, _element_name, 0)));
                 return to_value(resource->find(to_s(argv[0])), self);
             }
         }

@@ -547,7 +547,12 @@ Resource::Data::Data(const QUrl &b, const QString &r) :
 void Resource::Data::setUrl()
 {
     url = base;
-    url.setPath(base.path() + (base.path().endsWith("/") ? "" : "/") + resource);
+    url.setPath(join(base.path(), resource));
+}
+
+QString Resource::Data::join(const QString &first, const QString &second)
+{
+    return first + (first.endsWith('/') ? "" : "/") + second;
 }
 
 /*
@@ -574,7 +579,7 @@ void Resource::setResource(const QString &resource)
 
 Record Resource::find(const QVariant &id) const
 {
-    return find(FindOne, id.toString());
+    return find(FindOne, Data::join(d->url.path(), id.toString()));
 }
 
 RecordList Resource::find(FindMulti style, const QString &from, const ParamList &params) const

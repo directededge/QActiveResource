@@ -227,6 +227,7 @@ namespace QActiveResource
         struct Data : public QSharedData
         {
             Data(const QUrl &base, const QString &resource);
+            static QString join(const QString &first, const QString &second);
             void setUrl();
             QUrl base;
             QString resource;
