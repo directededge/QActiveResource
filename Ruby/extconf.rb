@@ -12,9 +12,8 @@ if qmake_path.empty?
   exit
 end
 
-qmake_path = File.readlink(qmake_path) if File.symlink?(qmake_path)
-qt_path = qmake_path.sub('/bin/qmake', '')
-
-pkg_config("#{qt_path}/lib/pkgconfig/QtCore.pc")
+qmake_path = File.readlink(qmake_path) while File.symlink?(qmake_path)
+qt_path = qmake_path.sub(/\/bin\/qmake.*$/, '')
+pkg_config("#{qt_path}/lib/pkgconfig/QtNetwork.pc")
 
 create_makefile("QAR")
