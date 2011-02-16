@@ -14,6 +14,13 @@ end
 
 qmake_path = File.readlink(qmake_path) while File.symlink?(qmake_path)
 qt_path = qmake_path.sub(/\/bin\/qmake.*$/, '')
+
+if ENV['PKG_CONFIG_PATH'] 
+  ENV['PKG_CONFIG_PATH'] += ":#{qt_path}/lib/pkgconfig"
+else
+  ENV['PKG_CONFIG_PATH'] = "#{qt_path}/lib/pkgconfig"
+end
+
 pkg_config("#{qt_path}/lib/pkgconfig/QtNetwork.pc")
 
 create_makefile("QAR")
