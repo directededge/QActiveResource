@@ -9,6 +9,8 @@
 #include <QDebug>
 #include <curl/curl.h>
 
+#define QAR_DEBUG "QAR_DEBUG"
+
 using namespace QActiveResource;
 
 static const QString QActiveResourceClassKey = "QActiveResource Class";
@@ -118,8 +120,11 @@ namespace HTTP
 
             if(httpCode >= 300 && httpCode < 400)
             {
-                qDebug() << (followRedirects ? "Following" : "Not following") << "redirect from"
-                         << url.toString(QUrl::RemoveUserInfo) << "to" << headers["Location"];
+                if(getenv(QAR_DEBUG))
+                {
+                    qDebug() << (followRedirects ? "Following" : "Not following") << "redirect from"
+                             << url.toString(QUrl::RemoveUserInfo) << "to" << headers["Location"];
+                }
 
                 curl_easy_cleanup(curl);
 
