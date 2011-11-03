@@ -228,15 +228,6 @@ static VALUE response_index_operator(VALUE self, VALUE index)
 }
 
 /*
- * Exception
- */
-
-static VALUE exception_message(VALUE self)
-{
-    return rb_ivar_get(self, __message);
-}
-
-/*
  * QAR
  */
 
@@ -374,8 +365,7 @@ extern "C"
         DEFINE_CLASS(ActiveResource, Base);
 
         #define AR_DEFINE_EXCEPTION(name, base) \
-            rb_eActiveResource##name = rb_define_class_under(rb_mActiveResource, #name, rb_e##base); \
-            rb_define_method(rb_eActiveResource##name, "message", (ARGS) exception_message, 0)
+            rb_eActiveResource##name = rb_define_class_under(rb_mActiveResource, #name, rb_e##base)
 
         AR_DEFINE_EXCEPTION(ConnectionError, StandardError);
         AR_DEFINE_EXCEPTION(TimeoutError, ActiveResourceConnectionError);
