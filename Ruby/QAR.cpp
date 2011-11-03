@@ -78,6 +78,7 @@ static const ID __body = rb_intern("@body");
 static const ID __headers = rb_intern("@headers");
 static const ID __prefix_options = rb_intern("@prefix_options");
 static const ID __response = rb_intern("@response");
+static const ID __message = rb_intern("@message");
 
 /*
  * Class variable symbols
@@ -227,6 +228,15 @@ static VALUE response_index_operator(VALUE self, VALUE index)
 }
 
 /*
+ * Exception
+ */
+
+static VALUE exception_message(VALUE self)
+{
+    return rb_ivar_get(self, __message);
+}
+
+/*
  * QAR
  */
 
@@ -316,6 +326,7 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
                     rb_eActiveResource##name, _allocate, 0);            \
                 rb_ivar_set(e, __code, code);                           \
                 rb_ivar_set(e, __response, response);                   \
+                rb_ivar_set(e, __message, to_value(ex.message()));      \
                 rb_exc_raise(e);                                        \
             }
 
@@ -363,7 +374,8 @@ extern "C"
         DEFINE_CLASS(ActiveResource, Base);
 
         #define AR_DEFINE_EXCEPTION(name, base) \
-            rb_eActiveResource##name = rb_define_class_under(rb_mActiveResource, #name, rb_e##base)
+            rb_eActiveResource##name = rb_define_class_under(rb_mActiveResource, #name, rb_e##base); \
+            rb_define_method(rb_eActiveResource##name, "message", (ARGS) exception_message, 0)
 
         AR_DEFINE_EXCEPTION(ConnectionError, StandardError);
         AR_DEFINE_EXCEPTION(TimeoutError, ActiveResourceConnectionError);
