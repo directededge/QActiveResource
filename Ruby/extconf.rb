@@ -1,4 +1,6 @@
 require 'mkmf'
+require 'pathname'
+
 dir_config("QAR")
 
 $LIBS << " -lcurl"
@@ -12,7 +14,7 @@ if qmake_path.empty?
   exit
 end
 
-qmake_path = File.readlink(qmake_path) while File.symlink?(qmake_path)
+qmake_path = Pathname.new(qmake_path).realpath
 qt_path = qmake_path.sub(/\/bin\/qmake.*$/, '')
 
 if ENV['PKG_CONFIG_PATH'] 
