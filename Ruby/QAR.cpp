@@ -204,11 +204,56 @@ static VALUE param_list_allocate(VALUE klass)
     return Data_Wrap_Struct(klass, param_list_mark, param_list_free, params);
 }
 
+static int params_hash_iterator_append_subhash(VALUE key, VALUE value, VALUE subHash)
+{
+    VALUE subhashKey = rb_hash_aref(subHash, rb_str_new2("key"));
+    VALUE params = rb_hash_aref(subHash, rb_str_new2("params"));
+    QActiveResource::ParamList *params_pointer;
+    Data_Get_Struct(params, QActiveResource::ParamList, params_pointer);
+    QString subKey = to_s(subhashKey) + "[" + to_s(key) + "]";
+
+    int tv = TYPE(value);
+
+    if(tv == T_STRING || tv == T_FLOAT || tv == T_FIXNUM
+       || tv == T_BIGNUM || tv == T_SYMBOL)
+    {
+        params_pointer->append(QActiveResource::Param(subKey, to_s(value)));
+    }
+    else if(tv == T_HASH)
+    {
+        qCritical() << "QActiveResource: Nesting level to deep.";
+    }
+    else
+    {
+        params_pointer->append(QActiveResource::Param(subKey, to_s(value)));
+        qCritical() << "QActiveResource: Value type of nested key" << to_s(key) << "not supported.";
+    }
+}
+
 static int params_hash_iterator(VALUE key, VALUE value, VALUE params)
 {
     QActiveResource::ParamList *params_pointer;
     Data_Get_Struct(params, QActiveResource::ParamList, params_pointer);
-    params_pointer->append(QActiveResource::Param(to_s(key), to_s(value)));
+
+    int tv = TYPE(value);
+
+    if(tv == T_HASH)
+    {
+        VALUE sub_hash = rb_hash_new();
+        rb_hash_aset(sub_hash, rb_str_new2("key"), key);
+        rb_hash_aset(sub_hash, rb_str_new2("params"), params);
+        rb_hash_foreach(value, (ITERATOR) params_hash_iterator_append_subhash, sub_hash);
+    }
+    else if(tv == T_STRING || tv == T_FLOAT || tv == T_FIXNUM
+            || tv == T_BIGNUM || tv == T_SYMBOL)
+    {
+        params_pointer->append(QActiveResource::Param(to_s(key), to_s(value)));
+    }
+    else
+    {
+        params_pointer->append(QActiveResource::Param(to_s(key), to_s(value)));
+        qCritical() << "QActiveResource: Value type of key" << to_s(key) << "not supported.";
+    }
 }
 
 /*
