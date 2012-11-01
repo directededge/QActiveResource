@@ -49,42 +49,74 @@ static VALUE rb_eActiveResourceServerError;
  * Symbols
  */
 
-static const ID _all = rb_intern("all");
-static const ID _allocate = rb_intern("allocate");
-static const ID _at = rb_intern("at");
-static const ID _code = rb_intern("code");
-static const ID _body = rb_intern("body");
-static const ID _collection_name = rb_intern("collection_name");
-static const ID _element_name = rb_intern("element_name");
-static const ID _extend = rb_intern("extend");
-static const ID _first = rb_intern("first");
-static const ID _from = rb_intern("from");
-static const ID _headers = rb_intern("headers");
-static const ID _new = rb_intern("new");
-static const ID _one = rb_intern("one");
-static const ID _params = rb_intern("params");
-static const ID _raise = rb_intern("raise");
-static const ID _site = rb_intern("site");
-static const ID _to_s = rb_intern("to_s");
-static const ID _last = rb_intern("last");
+static ID _all;
+static ID _allocate;
+static ID _at;
+static ID _code;
+static ID _body;
+static ID _collection_name;
+static ID _element_name;
+static ID _extend;
+static ID _first;
+static ID _from;
+static ID _headers;
+static ID _new;
+static ID _one;
+static ID _params;
+static ID _raise;
+static ID _site;
+static ID _to_s;
+static ID _last;
 
 /*
  * Instance variable symbols
  */
 
-static const ID __attributes = rb_intern("@attributes");
-static const ID __code = rb_intern("@code");
-static const ID __body = rb_intern("@body");
-static const ID __headers = rb_intern("@headers");
-static const ID __prefix_options = rb_intern("@prefix_options");
-static const ID __response = rb_intern("@response");
-static const ID __message = rb_intern("@message");
+static ID __attributes;
+static ID __code;
+static ID __body;
+static ID __headers;
+static ID __prefix_options;
+static ID __response;
+static ID __message;
 
 /*
  * Class variable symbols
  */
 
-static const ID ___qar_resource = rb_intern("@@qar_resource");
+static ID ___qar_resource;
+
+static void look_up_symbols()
+{
+    _all = rb_intern("all");
+    _allocate = rb_intern("allocate");
+    _at = rb_intern("at");
+    _code = rb_intern("code");
+    _body = rb_intern("body");
+    _collection_name = rb_intern("collection_name");
+    _element_name = rb_intern("element_name");
+    _extend = rb_intern("extend");
+    _first = rb_intern("first");
+    _from = rb_intern("from");
+    _headers = rb_intern("headers");
+    _new = rb_intern("new");
+    _one = rb_intern("one");
+    _params = rb_intern("params");
+    _raise = rb_intern("raise");
+    _site = rb_intern("site");
+    _to_s = rb_intern("to_s");
+    _last = rb_intern("last");
+
+    __attributes = rb_intern("@attributes");
+    __code = rb_intern("@code");
+    __body = rb_intern("@body");
+    __headers = rb_intern("@headers");
+    __prefix_options = rb_intern("@prefix_options");
+    __response = rb_intern("@response");
+    __message = rb_intern("@message");
+
+    ___qar_resource = rb_intern("@@qar_resource");
+}
 
 static QString to_s(VALUE value)
 {
@@ -394,7 +426,7 @@ static VALUE set_follow_redirects(VALUE self, VALUE follow)
 static VALUE qar_extended(VALUE self, VALUE base)
 {
     VALUE resource = rb_funcall(rb_cQARResource, _new, 0);
-    rb_cvar_set(base, ___qar_resource, resource, false);
+    rb_cvar_set(base, ___qar_resource, resource);
     return Qnil;
 }
 
@@ -402,6 +434,8 @@ extern "C"
 {
     void Init_QAR(void)
     {
+        look_up_symbols();
+
         #define DEFINE_CLASS(module, name) \
             rb_c##module##name = rb_define_class_under(rb_m##module, #name, rb_cObject)
 
