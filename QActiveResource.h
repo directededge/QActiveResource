@@ -14,7 +14,7 @@ namespace QActiveResource
     class QAR_EXPORT Response
     {
     public:
-        typedef int Code;
+        typedef long Code;
         typedef QHash<QString, QString> Headers;
         Response(Code code, const Headers &headers, const QByteArray &data);
         Code code() const;

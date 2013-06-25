@@ -224,10 +224,11 @@ static VALUE resource_allocate(VALUE klass)
  * ParamList
  */
 
-static VALUE param_list_mark(QActiveResource::ParamList *) {}
+static VALUE param_list_mark(QActiveResource::ParamList *) { return Qnil; }
 static VALUE param_list_free(QActiveResource::ParamList *params)
 {
     delete params;
+    return Qnil;
 }
 
 static VALUE param_list_allocate(VALUE klass)
@@ -260,6 +261,8 @@ static int params_hash_iterator_append_subhash(VALUE key, VALUE value, VALUE sub
         params_pointer->append(QActiveResource::Param(subKey, to_s(value)));
         qCritical() << "QActiveResource: Value type of nested key" << to_s(key) << "not supported.";
     }
+
+    return 0;
 }
 
 static int params_hash_iterator(VALUE key, VALUE value, VALUE params)
@@ -286,6 +289,8 @@ static int params_hash_iterator(VALUE key, VALUE value, VALUE params)
         params_pointer->append(QActiveResource::Param(to_s(key), to_s(value)));
         qCritical() << "QActiveResource: Value type of key" << to_s(key) << "not supported.";
     }
+
+    return 0;
 }
 
 /*
@@ -297,6 +302,7 @@ static VALUE response_initialize(VALUE self, VALUE code, VALUE headers, VALUE bo
     rb_ivar_set(self, __code, code);
     rb_ivar_set(self, __headers, headers);
     rb_ivar_set(self, __body, body);
+    return Qnil;
 }
 
 static VALUE response_index_operator(VALUE self, VALUE index)

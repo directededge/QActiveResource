@@ -17,13 +17,14 @@ static const QString QActiveResourceClassKey = "QActiveResource Class";
 
 static size_t writer(void *ptr, size_t size, size_t nmemb, void *stream)
 {
-    reinterpret_cast<QByteArray *>(stream)->append(QByteArray((const char *)(ptr), size * nmemb));
+    reinterpret_cast<QByteArray *>(stream)->append(QByteArray((const char *)(ptr),
+                                                              int(size * nmemb)));
     return size * nmemb;
 }
 
 static size_t header(void *ptr, size_t size, size_t nmemb, void *stream)
 {
-    QByteArray header((const char *) ptr, size * nmemb);
+    QByteArray header((const char *) ptr, int(size * nmemb));
 
     int index = header.indexOf(": ");
 
