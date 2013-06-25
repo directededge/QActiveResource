@@ -1,6 +1,6 @@
 
 /*
- * Copyright (C) 2010, Directed Edge, Inc. | Licensed under the MPL and LGPL
+ * Copyright (C) 2010-2013, Directed Edge, Inc. | Licensed under the MPL and LGPL
  */
 
 #include "QActiveResource.h"
@@ -348,6 +348,16 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
 
     try
     {
+        if(from.endsWith(".json"))
+        {
+            qDebug() << "QActiveResource can only deal with XML, not JSON requests.";
+
+            throw QActiveResource::Exception(
+                QActiveResource::Exception::ClientError,
+                QActiveResource::Response(400, QActiveResource::Response::Headers(), QByteArray()),
+                "QActiveResource only supports XML queries.");
+        }
+
         if(argc >= 1)
         {
             ID current = SYM2ID(argv[0]);
