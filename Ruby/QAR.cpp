@@ -79,6 +79,7 @@ static ID __headers;
 static ID __prefix_options;
 static ID __response;
 static ID __message;
+static ID __persisted;
 
 /*
  * Class variable symbols
@@ -114,6 +115,7 @@ static void look_up_symbols()
     __prefix_options = rb_intern("@prefix_options");
     __response = rb_intern("@response");
     __message = rb_intern("@message");
+    __persisted = rb_intern("@persisted");
 
     ___qar_resource = rb_intern("@@qar_resource");
 }
@@ -162,6 +164,7 @@ static VALUE to_value(const QVariant &v, VALUE base, bool isChild = false)
         VALUE value = rb_funcall(klass, _allocate, 0);
         rb_ivar_set(value, __attributes, attributes);
         rb_ivar_set(value, __prefix_options, rb_hash_new());
+        rb_ivar_set(value, __persisted, Qtrue);
         return value;
     }
     case QVariant::List:
