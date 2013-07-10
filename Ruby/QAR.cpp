@@ -7,9 +7,15 @@
 #include <QDateTime>
 #include <QDebug>
 #include <ruby.h>
+#include <ruby/encoding.h>
 
 typedef VALUE(*ARGS)(...);
 typedef int(*ITERATOR)(...);
+
+/*
+ * UTF-8 encoding flag index
+ */
+static int rb_utf8_enc_index;
 
 /*
  * Modules
@@ -128,7 +134,10 @@ static QString to_s(VALUE value)
 
 static VALUE to_value(const QString &s)
 {
-    return rb_str_new2(s.toUtf8());
+    VALUE string = rb_str_new2(s.toUtf8());
+    rb_enc_associate_index(string, rb_utf8_enc_index);
+
+    return string;
 }
 
 static VALUE to_value(const QVariant &v, VALUE base, bool isChild = false)
@@ -454,6 +463,8 @@ extern "C"
     void Init_QAR(void)
     {
         look_up_symbols();
+
+        rb_utf8_enc_index = rb_enc_find_index("UTF-8");
 
         #define DEFINE_CLASS(module, name) \
             rb_c##module##name = rb_define_class_under(rb_m##module, #name, rb_cObject)
