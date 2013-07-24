@@ -235,10 +235,9 @@ static VALUE resource_allocate(VALUE klass)
  * ParamList
  */
 
-static VALUE param_list_free(QActiveResource::ParamList *params)
+static void param_list_free(QActiveResource::ParamList *params)
 {
     delete params;
-    return Qnil;
 }
 
 static VALUE param_list_allocate(VALUE klass)
