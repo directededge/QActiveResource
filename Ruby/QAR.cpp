@@ -354,7 +354,7 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
         from = to_s(rb_hash_aref(argv[1], ID2SYM(_from)));
     }
 
-    QActiveResource::ParamList *params_pointer;
+    QActiveResource::ParamList *params_pointer = 0;
     Data_Get_Struct(params, QActiveResource::ParamList, params_pointer);
     resource->setResource(to_s(rb_funcall(self, _collection_name, 0)));
 
