@@ -220,7 +220,6 @@ static VALUE to_value(const QHash<QString, QString> &hash)
  * Resource
  */
 
-static void resource_mark(QActiveResource::Resource *) {}
 static void resource_free(QActiveResource::Resource *resource)
 {
     delete resource;
@@ -229,14 +228,13 @@ static void resource_free(QActiveResource::Resource *resource)
 static VALUE resource_allocate(VALUE klass)
 {
     QActiveResource::Resource *resource = new QActiveResource::Resource;
-    return Data_Wrap_Struct(klass, resource_mark, resource_free, resource);
+    return Data_Wrap_Struct(klass, 0, resource_free, resource);
 }
 
 /*
  * ParamList
  */
 
-static VALUE param_list_mark(QActiveResource::ParamList *) { return Qnil; }
 static VALUE param_list_free(QActiveResource::ParamList *params)
 {
     delete params;
@@ -246,7 +244,7 @@ static VALUE param_list_free(QActiveResource::ParamList *params)
 static VALUE param_list_allocate(VALUE klass)
 {
     QActiveResource::ParamList *params = new QActiveResource::ParamList();
-    return Data_Wrap_Struct(klass, param_list_mark, param_list_free, params);
+    return Data_Wrap_Struct(klass, 0, param_list_free, params);
 }
 
 static int params_hash_iterator_append_subhash(VALUE key, VALUE value, VALUE subHash)
