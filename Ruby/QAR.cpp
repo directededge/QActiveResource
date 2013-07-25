@@ -246,6 +246,20 @@ static VALUE param_list_allocate(VALUE klass)
     return Data_Wrap_Struct(klass, 0, param_list_free, params);
 }
 
+/*
+ * Headers
+ */
+static void headers_free(QActiveResource::Resource::Headers *headers)
+{
+    delete headers;
+}
+
+static VALUE headers_allocate(VALUE klass)
+{
+    QActiveResource::Resource::Headers *headers = new QActiveResource::Resource::Headers();
+    return Data_Wrap_Struct(klass, 0, headers_free, headers);
+}
+
 static int params_hash_iterator_append_subhash(VALUE key, VALUE value, VALUE subHash)
 {
     VALUE subhashKey = rb_hash_aref(subHash, rb_str_new2("key"));
@@ -270,6 +284,16 @@ static int params_hash_iterator_append_subhash(VALUE key, VALUE value, VALUE sub
         params_pointer->append(QActiveResource::Param(subKey, to_s(value)));
         qCritical() << "QActiveResource: Value type of nested key" << to_s(key) << "not supported.";
     }
+
+    return 0;
+}
+
+static int headers_hash_iterator(VALUE key, VALUE value, VALUE headers)
+{
+    QActiveResource::Resource::Headers *headers_pointer;
+    Data_Get_Struct(headers, QActiveResource::Resource::Headers, headers_pointer);
+
+    headers_pointer->insert(to_s(key), to_s(value));
 
     return 0;
 }
@@ -354,6 +378,12 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
     QActiveResource::ParamList *params_pointer = 0;
     Data_Get_Struct(params, QActiveResource::ParamList, params_pointer);
     resource->setResource(to_s(rb_funcall(self, _collection_name, 0)));
+
+    QActiveResource::Resource::Headers *headers_pointer = 0;
+    VALUE headers = headers_allocate(rb_cData);
+    rb_hash_foreach(rb_funcall(self, _headers, 0), (ITERATOR) headers_hash_iterator, headers);
+    Data_Get_Struct(headers, QActiveResource::Resource::Headers, headers_pointer);
+    resource->setHeaders(*headers_pointer);
 
     try
     {

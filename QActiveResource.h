@@ -160,6 +160,8 @@ namespace QActiveResource
     class QAR_EXPORT Resource
     {
     public:
+        typedef QHash<QString, QString> Headers;
+
         /*!
          * Instantiates a resource starting at \a base using \a resource.
          * Authentication info may be included in the URL.
@@ -180,6 +182,11 @@ namespace QActiveResource
          * Sets the resource (i.e. "customers") of the object.
          */
         void setResource(const QString &resource);
+
+        /*!
+         * Sets optional headers (e.g. API keys) of the resource
+         */
+        void setHeaders(const Headers &headers);
 
         /*!
          * \return The record with the given text / numeric ID.
@@ -231,6 +238,7 @@ namespace QActiveResource
             void setUrl();
             QUrl base;
             QString resource;
+            Headers headers;
             QUrl url;
             bool followRedirects;
         };

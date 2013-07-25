@@ -91,7 +91,7 @@ namespace HTTP
         throw Exception(type, response, message);
     }
 
-    QByteArray get(QUrl url, bool followRedirects = false)
+    QByteArray get(QUrl url, bool followRedirects = false, const QHash<QString, QString> &requestHeaders = QHash<QString, QString>())
     {
         QByteArray data;
         CURL *curl = curl_easy_init();
@@ -104,6 +104,15 @@ namespace HTTP
             QByteArray errorBuffer(CURL_ERROR_SIZE, 0);
             Response::Headers headers;
 
+            struct curl_slist *requestHeaderList = NULL;
+            QHash<QString, QString>::const_iterator it = requestHeaders.constBegin();
+            while(it != requestHeaders.constEnd())
+            {
+                QString header = it.key() + ": " + it.value();
+                requestHeaderList = curl_slist_append(requestHeaderList, header.toUtf8());
+                ++it;
+            }
+
             curl_easy_setopt(curl, CURLOPT_URL, encodedUrl.data());
             curl_easy_setopt(curl, CURLOPT_WRITEHEADER, (void *) &headers);
             curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header);
@@ -113,6 +122,7 @@ namespace HTTP
             curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
             curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer.data());
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, requestHeaderList);
 
             result = curl_easy_perform(curl);
 
@@ -333,14 +343,14 @@ static QVariant reader(QXmlStreamReader &xml, bool advance, bool isHash)
     return QVariant();
 }
 
-static RecordList fetch(QUrl url, bool followRedirects = false)
+static RecordList fetch(QUrl url, bool followRedirects, const QActiveResource::Resource::Headers &headers)
 {
     if(!url.path().endsWith(".xml"))
     {
         url.setPath(url.path() + ".xml");
     }
 
-    QByteArray data = HTTP::get(url, followRedirects);
+    QByteArray data = HTTP::get(url, followRedirects, headers);
 
     QXmlStreamReader xml(data);
 
@@ -583,6 +593,11 @@ void Resource::setResource(const QString &resource)
     d->setUrl();
 }
 
+void Resource::setHeaders(const Headers &headers)
+{
+    d->headers = headers;
+}
+
 Record Resource::find(const QVariant &id) const
 {
     return find(FindOne, Data::join(d->url.path(), id.toString()));
@@ -612,7 +627,7 @@ RecordList Resource::find(FindMulti style, const QString &from, const ParamList 
         }
     }
 
-    return fetch(url, d->followRedirects);
+    return fetch(url, d->followRedirects, d->headers);
 }
 
 Record Resource::find(FindSingle style, const QString &from, const ParamList &params) const
