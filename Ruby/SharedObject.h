@@ -14,41 +14,22 @@ namespace SharedObject
     public:
         Scope()
         {
-            m_self = Data_Wrap_Struct(rb_cData, &mark, &free, this);
-            rb_gc_register_address(&m_self);
+            m_objects = rb_ary_new();
+            rb_gc_register_address(&m_objects);
         }
 
         ~Scope()
         {
-            rb_gc_unregister_address(&m_self);
-        }
-
-        static void mark(Scope *scope)
-        {
-            scope->markObjects();
-        }
-
-        static void free(Scope *scope)
-        {
-            // do nothing.
-        }
-
-        void markObjects()
-        {
-            foreach(VALUE obj, m_objects)
-            {
-                rb_gc_mark(obj);
-            }
+            rb_gc_unregister_address(&m_objects);
         }
 
         void registerObject(VALUE obj)
         {
-            m_objects.append(obj);
+            rb_ary_push(m_objects, obj);
         }
 
     private:
-        VALUE m_self;
-        QList<VALUE> m_objects;
+        VALUE m_objects;
     };
 
     template <class T>
