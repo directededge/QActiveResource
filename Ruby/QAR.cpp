@@ -4,6 +4,7 @@
  */
 
 #include "QActiveResource.h"
+#include "SharedObject.h"
 #include <QDateTime>
 #include <QDebug>
 #include <ruby.h>
@@ -231,41 +232,11 @@ static VALUE resource_allocate(VALUE klass)
     return Data_Wrap_Struct(klass, 0, resource_free, resource);
 }
 
-/*
- * ParamList
- */
-
-static void param_list_free(QActiveResource::ParamList *params)
-{
-    delete params;
-}
-
-static VALUE param_list_allocate(VALUE klass)
-{
-    QActiveResource::ParamList *params = new QActiveResource::ParamList();
-    return Data_Wrap_Struct(klass, 0, param_list_free, params);
-}
-
-/*
- * Headers
- */
-static void headers_free(QActiveResource::Resource::Headers *headers)
-{
-    delete headers;
-}
-
-static VALUE headers_allocate(VALUE klass)
-{
-    QActiveResource::Resource::Headers *headers = new QActiveResource::Resource::Headers();
-    return Data_Wrap_Struct(klass, 0, headers_free, headers);
-}
-
 static int params_hash_iterator_append_subhash(VALUE key, VALUE value, VALUE subHash)
 {
     VALUE subhashKey = rb_hash_aref(subHash, rb_str_new2("key"));
     VALUE params = rb_hash_aref(subHash, rb_str_new2("params"));
-    QActiveResource::ParamList *params_pointer;
-    Data_Get_Struct(params, QActiveResource::ParamList, params_pointer);
+    SharedObject::Wrapper<QActiveResource::ParamList> paramsObject(params);
     QString subKey = to_s(subhashKey) + "[" + to_s(key) + "]";
 
     int tv = TYPE(value);
@@ -273,7 +244,7 @@ static int params_hash_iterator_append_subhash(VALUE key, VALUE value, VALUE sub
     if(tv == T_STRING || tv == T_FLOAT || tv == T_FIXNUM
        || tv == T_BIGNUM || tv == T_SYMBOL)
     {
-        params_pointer->append(QActiveResource::Param(subKey, to_s(value)));
+        paramsObject->append(QActiveResource::Param(subKey, to_s(value)));
     }
     else if(tv == T_HASH)
     {
@@ -281,27 +252,16 @@ static int params_hash_iterator_append_subhash(VALUE key, VALUE value, VALUE sub
     }
     else
     {
-        params_pointer->append(QActiveResource::Param(subKey, to_s(value)));
+        paramsObject->append(QActiveResource::Param(subKey, to_s(value)));
         qCritical() << "QActiveResource: Value type of nested key" << to_s(key) << "not supported.";
     }
 
     return 0;
 }
 
-static int headers_hash_iterator(VALUE key, VALUE value, VALUE headers)
-{
-    QActiveResource::Resource::Headers *headers_pointer;
-    Data_Get_Struct(headers, QActiveResource::Resource::Headers, headers_pointer);
-
-    headers_pointer->insert(to_s(key), to_s(value));
-
-    return 0;
-}
-
 static int params_hash_iterator(VALUE key, VALUE value, VALUE params)
 {
-    QActiveResource::ParamList *params_pointer;
-    Data_Get_Struct(params, QActiveResource::ParamList, params_pointer);
+    SharedObject::Wrapper<QActiveResource::ParamList> paramsObject(params);
 
     int tv = TYPE(value);
 
@@ -315,13 +275,22 @@ static int params_hash_iterator(VALUE key, VALUE value, VALUE params)
     else if(tv == T_STRING || tv == T_FLOAT || tv == T_FIXNUM
             || tv == T_BIGNUM || tv == T_SYMBOL)
     {
-        params_pointer->append(QActiveResource::Param(to_s(key), to_s(value)));
+        paramsObject->append(QActiveResource::Param(to_s(key), to_s(value)));
     }
     else
     {
-        params_pointer->append(QActiveResource::Param(to_s(key), to_s(value)));
+        paramsObject->append(QActiveResource::Param(to_s(key), to_s(value)));
         qCritical() << "QActiveResource: Value type of key" << to_s(key) << "not supported.";
     }
+
+    return 0;
+}
+
+static int headers_hash_iterator(VALUE key, VALUE value, VALUE headers)
+{
+    SharedObject::Wrapper<QActiveResource::Resource::Headers> headersObject(headers);
+
+    headersObject->insert(to_s(key), to_s(value));
 
     return 0;
 }
@@ -357,11 +326,13 @@ static QActiveResource::Resource *get_resource(VALUE self)
 
 static VALUE qar_find(int argc, VALUE *argv, VALUE self)
 {
+    SharedObject::Scope objectScope;
+
     QActiveResource::Resource *resource = get_resource(self);
     resource->setBase(to_s(rb_funcall(self, _site, 0)));
 
     QString from;
-    VALUE params = param_list_allocate(rb_cData);
+    SharedObject::Wrapper<QActiveResource::ParamList>paramsObject(objectScope);
 
     if(argc >= 2 && TYPE(argv[1]) == T_HASH)
     {
@@ -369,21 +340,17 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
 
         if(params_hash != Qnil && TYPE(params_hash) == T_HASH)
         {
-            rb_hash_foreach(params_hash, (ITERATOR) params_hash_iterator, params);
+            rb_hash_foreach(params_hash, (ITERATOR) params_hash_iterator, paramsObject.value());
         }
 
         from = to_s(rb_hash_aref(argv[1], ID2SYM(_from)));
     }
 
-    QActiveResource::ParamList *params_pointer = 0;
-    Data_Get_Struct(params, QActiveResource::ParamList, params_pointer);
     resource->setResource(to_s(rb_funcall(self, _collection_name, 0)));
 
-    QActiveResource::Resource::Headers *headers_pointer = 0;
-    VALUE headers = headers_allocate(rb_cData);
-    rb_hash_foreach(rb_funcall(self, _headers, 0), (ITERATOR) headers_hash_iterator, headers);
-    Data_Get_Struct(headers, QActiveResource::Resource::Headers, headers_pointer);
-    resource->setHeaders(*headers_pointer);
+    SharedObject::Wrapper<QActiveResource::Resource::Headers> headersObject(objectScope);
+    rb_hash_foreach(rb_funcall(self, _headers, 0), (ITERATOR) headers_hash_iterator, headersObject.value());
+    resource->setHeaders(*headersObject.ptr());
 
     try
     {
@@ -404,17 +371,17 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
             if(current == _one)
             {
                 resource->setResource(to_s(rb_funcall(self, _element_name, 0)));
-                QVariant v = resource->find(QActiveResource::FindOne, from, *params_pointer);
+                QVariant v = resource->find(QActiveResource::FindOne, from, *paramsObject.ptr());
                 return to_value(v, self);
             }
             else if(current == _first)
             {
-                QVariant v = resource->find(QActiveResource::FindFirst, from, *params_pointer);
+                QVariant v = resource->find(QActiveResource::FindFirst, from, *paramsObject.ptr());
                 return to_value(v, self);
             }
             else if(current == _last)
             {
-                QVariant v = resource->find(QActiveResource::FindLast, from, *params_pointer);
+                QVariant v = resource->find(QActiveResource::FindLast, from, *paramsObject.ptr());
                 return to_value(v, self);
             }
             else if(current != _all)
@@ -424,7 +391,7 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
         }
 
         QActiveResource::RecordList records =
-            resource->find(QActiveResource::FindAll, from, *params_pointer);
+            resource->find(QActiveResource::FindAll, from, *paramsObject.ptr());
         VALUE array = rb_ary_new2(records.length());
 
         for(int i = 0; i < records.length(); i++)
@@ -528,8 +495,6 @@ extern "C"
 
         DEFINE_CLASS(QAR, ParamList);
         rb_define_alloc_func(rb_cQARResponse, resource_allocate);
-
-        rb_define_alloc_func(rb_cQARParamList, param_list_allocate);
 
         rb_cQARResource = rb_define_class_under(rb_mQAR, "Resource", rb_cObject);
         rb_define_alloc_func(rb_cQARResource, resource_allocate);
