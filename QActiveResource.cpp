@@ -91,7 +91,8 @@ namespace HTTP
         throw Exception(type, response, message);
     }
 
-    QByteArray get(QUrl url, bool followRedirects = false, const QHash<QString, QString> &requestHeaders = QHash<QString, QString>())
+    QByteArray get(QUrl url, bool followRedirects = false,
+                   const QHash<QString, QString> &requestHeaders = QHash<QString, QString>())
     {
         QByteArray data;
         CURL *curl = curl_easy_init();
@@ -343,7 +344,8 @@ static QVariant reader(QXmlStreamReader &xml, bool advance, bool isHash)
     return QVariant();
 }
 
-static RecordList fetch(QUrl url, bool followRedirects, const QActiveResource::Resource::Headers &headers)
+static RecordList fetch(QUrl url, bool followRedirects,
+                        const QActiveResource::Resource::Headers &headers)
 {
     if(!url.path().endsWith(".xml"))
     {

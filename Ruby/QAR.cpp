@@ -349,7 +349,8 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
     resource->setResource(to_s(rb_funcall(self, _collection_name, 0)));
 
     SharedObject::Wrapper<QActiveResource::Resource::Headers> headersObject(objectScope);
-    rb_hash_foreach(rb_funcall(self, _headers, 0), (ITERATOR) headers_hash_iterator, headersObject.value());
+    rb_hash_foreach(rb_funcall(self, _headers, 0), (ITERATOR) headers_hash_iterator,
+                    headersObject.value());
     resource->setHeaders(*headersObject.ptr());
 
     try
