@@ -46,7 +46,7 @@ namespace HTTP
 
         if(result == CURLE_OPERATION_TIMEOUTED)
         {
-            type = Exception::ConnectionError;
+            type = Exception::TimeoutError;
         }
         else if(result == CURLE_SSL_CONNECT_ERROR)
         {
@@ -69,6 +69,10 @@ namespace HTTP
             else if(response.code() == 404)
             {
                 type = Exception::ResourceNotFound;
+            }
+            else if(response.code() == 405)
+            {
+                type = Exception::MethodNotAllowed;
             }
             else if(response.code() == 409)
             {
