@@ -230,6 +230,16 @@ namespace QActiveResource
          */
         void setFollowRedirects(bool follow);
 
+        /*!
+         * The timeout in seconds before the connection is closed.
+         */
+        int timeout() const;
+
+        /*!
+         * Set the timeout in seconds before the connection is closed.
+         */
+        void setTimeout(int timeout);
+
     private:
         struct Data : public QSharedData
         {
@@ -241,6 +251,7 @@ namespace QActiveResource
             Headers headers;
             QUrl url;
             bool followRedirects;
+            int timeout;
         };
 
         QSharedDataPointer<Data> d;

@@ -10,6 +10,7 @@
 #include <curl/curl.h>
 
 #define QAR_DEBUG "QAR_DEBUG"
+#define DEFAULT_TIMEOUT 60
 
 using namespace QActiveResource;
 
@@ -95,7 +96,7 @@ namespace HTTP
         throw Exception(type, response, message);
     }
 
-    QByteArray get(QUrl url, bool followRedirects = false,
+    QByteArray get(QUrl url, bool followRedirects = false, int timeout = DEFAULT_TIMEOUT,
                    const QHash<QString, QString> &requestHeaders = QHash<QString, QString>())
     {
         QByteArray data;
@@ -123,7 +124,7 @@ namespace HTTP
             curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header);
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writer);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) &data);
-            curl_easy_setopt(curl, CURLOPT_TIMEOUT, 25);
+            curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
             curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
             curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer.data());
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
@@ -349,7 +350,7 @@ static QVariant reader(QXmlStreamReader &xml, bool advance, bool isHash)
     return QVariant();
 }
 
-static RecordList fetch(QUrl url, bool followRedirects,
+static RecordList fetch(QUrl url, bool followRedirects, int timeout,
                         const QActiveResource::Resource::Headers &headers)
 {
     if(!url.path().endsWith(".xml"))
@@ -357,7 +358,7 @@ static RecordList fetch(QUrl url, bool followRedirects,
         url.setPath(url.path() + ".xml");
     }
 
-    QByteArray data = HTTP::get(url, followRedirects, headers);
+    QByteArray data = HTTP::get(url, followRedirects, timeout, headers);
 
     QXmlStreamReader xml(data);
 
@@ -562,7 +563,8 @@ Resource::Data::Data(const QUrl &b, const QString &r) :
     base(b),
     resource(r),
     url(base),
-    followRedirects(false)
+    followRedirects(false),
+    timeout(DEFAULT_TIMEOUT)
 {
     setUrl();
 }
@@ -634,7 +636,7 @@ RecordList Resource::find(FindMulti style, const QString &from, const ParamList 
         }
     }
 
-    return fetch(url, d->followRedirects, d->headers);
+    return fetch(url, d->followRedirects, d->timeout, d->headers);
 }
 
 Record Resource::find(FindSingle style, const QString &from, const ParamList &params) const
@@ -676,4 +678,14 @@ RecordList Resource::find(FindMulti style, const QString &from,
 void Resource::setFollowRedirects(bool followRedirects)
 {
     d->followRedirects = followRedirects;
+}
+
+int Resource::timeout() const
+{
+    return d->timeout;
+}
+
+void Resource::setTimeout(int timeout)
+{
+    d->timeout = timeout;
 }

@@ -87,6 +87,7 @@ static ID __prefix_options;
 static ID __response;
 static ID __message;
 static ID __persisted;
+static ID __timeout;
 
 /*
  * Class variable symbols
@@ -123,6 +124,7 @@ static void look_up_symbols()
     __response = rb_intern("@response");
     __message = rb_intern("@message");
     __persisted = rb_intern("@persisted");
+    __timeout = rb_intern("@timeout");
 
     ___qar_resource = rb_intern("@@qar_resource");
 }
@@ -337,6 +339,12 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
 
     QActiveResource::Resource *resource = get_resource(self);
     resource->setBase(to_s(rb_funcall(self, _site, 0)));
+
+    VALUE timeout = rb_ivar_get(self, __timeout);
+    if(timeout != Qnil)
+    {
+        resource->setTimeout(NUM2INT(timeout));
+    }
 
     QString from;
     SharedObject::Wrapper<QActiveResource::ParamList>paramsObject(objectScope);
