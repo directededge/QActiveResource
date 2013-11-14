@@ -138,8 +138,9 @@ namespace HTTP
             {
                 if(getenv(QAR_DEBUG))
                 {
-                    qDebug() << (followRedirects ? "Following" : "Not following") << "redirect from"
-                             << url.toString(QUrl::RemoveUserInfo) << "to" << headers["Location"];
+                    qDebug() << (followRedirects ? "Following" : "Not following")
+                             << "redirect from" << url.toString(QUrl::RemoveUserInfo)
+                             << "to" << headers["Location"];
                 }
 
                 curl_easy_cleanup(curl);

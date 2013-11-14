@@ -164,7 +164,9 @@ static VALUE to_value(const QVariant &v, VALUE base, bool isChild = false)
             klass = rb_define_class_under(base, name.toUtf8(), rb_cActiveResourceBase);
         }
 
-        for(QActiveResource::Record::ConstIterator it = record.begin(); it != record.end(); ++it)
+        for(QActiveResource::Record::ConstIterator it = record.begin();
+            it != record.end();
+            ++it)
         {
             VALUE key = to_value(it.key());
             VALUE value = to_value(it.value(), base, true);
@@ -209,7 +211,9 @@ static VALUE to_value(const QHash<QString, QString> &hash)
 {
     VALUE values = rb_hash_new();
 
-    for(QHash<QString, QString>::ConstIterator it = hash.begin(); it != hash.end(); ++it)
+    for(QHash<QString, QString>::ConstIterator it = hash.begin();
+        it != hash.end();
+        ++it)
     {
         rb_hash_aset(values, to_value(it.key()), to_value(it.value()));
     }
@@ -241,8 +245,8 @@ static int params_hash_iterator_append_subhash(VALUE key, VALUE value, VALUE sub
 
     int tv = TYPE(value);
 
-    if(tv == T_STRING || tv == T_FLOAT || tv == T_FIXNUM
-       || tv == T_BIGNUM || tv == T_SYMBOL)
+    if(tv == T_STRING || tv == T_FLOAT || tv == T_FIXNUM || tv == T_BIGNUM ||
+       tv == T_SYMBOL)
     {
         paramsObject->append(QActiveResource::Param(subKey, to_s(value)));
     }
@@ -253,7 +257,8 @@ static int params_hash_iterator_append_subhash(VALUE key, VALUE value, VALUE sub
     else
     {
         paramsObject->append(QActiveResource::Param(subKey, to_s(value)));
-        qCritical() << "QActiveResource: Value type of nested key" << to_s(key) << "not supported.";
+        qCritical() << "QActiveResource: Value type of nested key" << to_s(key)
+                    << "not supported.";
     }
 
     return 0;
@@ -270,7 +275,8 @@ static int params_hash_iterator(VALUE key, VALUE value, VALUE params)
         VALUE sub_hash = rb_hash_new();
         rb_hash_aset(sub_hash, rb_str_new2("key"), key);
         rb_hash_aset(sub_hash, rb_str_new2("params"), params);
-        rb_hash_foreach(value, (ITERATOR) params_hash_iterator_append_subhash, sub_hash);
+        rb_hash_foreach(value, (ITERATOR) params_hash_iterator_append_subhash,
+                        sub_hash);
     }
     else if(tv == T_STRING || tv == T_FLOAT || tv == T_FIXNUM
             || tv == T_BIGNUM || tv == T_SYMBOL)
@@ -280,7 +286,8 @@ static int params_hash_iterator(VALUE key, VALUE value, VALUE params)
     else
     {
         paramsObject->append(QActiveResource::Param(to_s(key), to_s(value)));
-        qCritical() << "QActiveResource: Value type of key" << to_s(key) << "not supported.";
+        qCritical() << "QActiveResource: Value type of key" << to_s(key)
+                    << "not supported.";
     }
 
     return 0;
@@ -340,7 +347,9 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
 
         if(params_hash != Qnil && TYPE(params_hash) == T_HASH)
         {
-            rb_hash_foreach(params_hash, (ITERATOR) params_hash_iterator, paramsObject.value());
+            rb_hash_foreach(params_hash,
+                            (ITERATOR) params_hash_iterator,
+                            paramsObject.value());
         }
 
         from = to_s(rb_hash_aref(argv[1], ID2SYM(_from)));
@@ -359,10 +368,14 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
         {
             qDebug() << "QActiveResource can only deal with XML, not JSON requests.";
 
-            throw QActiveResource::Exception(
-                QActiveResource::Exception::ClientError,
-                QActiveResource::Response(400, QActiveResource::Response::Headers(), QByteArray()),
-                "QActiveResource only supports XML queries.");
+            QActiveResource::Response response(400,
+                                               QActiveResource::Response::Headers(),
+                                               QByteArray());
+
+            throw QActiveResource::Exception(QActiveResource::Exception::ClientError,
+                                             response,
+                                             "QActiveResource only supports XML queries.");
+
         }
 
         if(argc >= 1)
@@ -372,17 +385,20 @@ static VALUE qar_find(int argc, VALUE *argv, VALUE self)
             if(current == _one)
             {
                 resource->setResource(to_s(rb_funcall(self, _element_name, 0)));
-                QVariant v = resource->find(QActiveResource::FindOne, from, *paramsObject.ptr());
+                QVariant v = resource->find(QActiveResource::FindOne, from,
+                                            *paramsObject.ptr());
                 return to_value(v, self);
             }
             else if(current == _first)
             {
-                QVariant v = resource->find(QActiveResource::FindFirst, from, *paramsObject.ptr());
+                QVariant v = resource->find(QActiveResource::FindFirst, from,
+                                            *paramsObject.ptr());
                 return to_value(v, self);
             }
             else if(current == _last)
             {
-                QVariant v = resource->find(QActiveResource::FindLast, from, *paramsObject.ptr());
+                QVariant v = resource->find(QActiveResource::FindLast, from,
+                                            *paramsObject.ptr());
                 return to_value(v, self);
             }
             else if(current != _all)
@@ -469,7 +485,8 @@ extern "C"
         DEFINE_CLASS(ActiveResource, Base);
 
         #define AR_DEFINE_EXCEPTION(name, base) \
-            rb_eActiveResource##name = rb_define_class_under(rb_mActiveResource, #name, rb_e##base)
+          rb_eActiveResource##name =            \
+              rb_define_class_under(rb_mActiveResource, #name, rb_e##base)
 
         AR_DEFINE_EXCEPTION(ConnectionError, StandardError);
         AR_DEFINE_EXCEPTION(TimeoutError, ActiveResourceConnectionError);
